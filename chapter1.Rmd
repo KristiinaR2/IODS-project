@@ -1,7 +1,11 @@
 
 # About the project
 
-*Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you should use R Markdown syntax.*
+The contents of the course Introduction to Open Data Science are **really** interesting, and I'm looking forward to learn more how to use R and to manage data more in a more systematic and efficient way. This is my first touch with GitHub as a user, so there is lot to learn. I hope to keep up with the course!
+
+The link to my IODS-project GitHub page is the following
+[https://kristiinar2.github.io/IODS-project/]
+
 
 ```{r}
 # This is a so-called "R chunk" where you can write R code.
