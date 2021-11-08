@@ -1,0 +1,21 @@
+---
+title: "IODS week2"
+author: "Kristiina Räihä"
+date: "8 11 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+```
+
+## 
+
+```{r}
+
+http://www.helsinki.fi/~kvehkala/JYTmooc/JYTOPKYS3-data.txt into R (the separator is a tab ("\t") and the file includes a header
+                                                                    
+```
+
