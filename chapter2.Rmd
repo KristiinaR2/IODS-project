@@ -44,7 +44,6 @@ learning2014_3 <- learning2014_2%>%
 #deleted the X variable (rownumber)
 learning2014_3 <- select(learning2014_3, -X)
 
-glimpse(learning2014_3)
 str(learning2014_3)
 
 ```
@@ -68,11 +67,6 @@ gender_n <- learning2014_3%>%
   group_by(gender)%>%
   summarise(n=n())%>%
   ungroup()
-
-gender_n
-summary(learning2014_3)
-scattermatrix2
-matrix3
 
 
 ```
@@ -125,7 +119,7 @@ summary(fit2)
 
 The residual plots show that the residuals of the observations are not related to the fitted values, and they occur on both sides of zero (= assumption that the size of error does not depend on explanatory variables). 
 
-The distribution of residual terms follows more or less a normal distribution, and the Q-Q plot is almost a straight line: (=assumptions of the errors being normally distributed).
+The distribution of residual terms follows more or less a normal distribution, and the Q-Q plot is almost a straight line (=assumptions of the errors being normally distributed).
 
 Also a noticeable thing is, that there seems to be couple of outliers, that might affect the regression. 
 
