@@ -14,8 +14,8 @@ date()
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 
-install.packages("GGally")
-install.packages("ggResidpanel")
+#install.packages("GGally")
+#install.packages("ggResidpanel")
 
 library(tidyverse)
 library(dplyr)

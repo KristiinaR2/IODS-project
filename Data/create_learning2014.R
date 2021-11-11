@@ -75,10 +75,6 @@ str(learning2014_2)
 head(learning2014_2, 10)
 
 
-```
-
-
-
 ## 1
 
 #The data consists of 166 observations (rows) of 8 variables (columns). 
@@ -101,7 +97,6 @@ learning2014_3 <- select(learning2014_3, -X)
 glimpse(learning2014_3)
 str(learning2014_3)
 
-```
 
 ## 2
 
@@ -134,7 +129,6 @@ matrix3
 
 #The gender variable has more observation in F(n=110), than in M(n=56), that affects the distributions. The distributions of age (mean 25) are skewed to the right, as most of the subjects are close to 20 years. The variables are quite normally distributed taking into account the sample size. 
 
-```
 
 ## 3
 
@@ -168,7 +162,6 @@ qplot(Attitude, Points, data = learning2014_3) + geom_smooth(method = "lm")
 
 
 ## 4
-
 
 #The results of the model "fit2" indicate, that attitude is a statistically significant explanatory variable 
 #(F(1,164)=38.61, p<.001)for the students points.
