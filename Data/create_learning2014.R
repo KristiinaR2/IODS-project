@@ -44,14 +44,13 @@ str(lrn14)
 
 keep_columns <- c("gender","Age","Attitude", "deep", "stra", "surf", "Points")
 
-# select the 'keep_columns' to create a new dataset
+#Select the 'keep_columns' to create a new dataset
 learning2014 <- select(lrn14, one_of(keep_columns))
 
-# see the stucture of the new dataset
+#See the stucture of the new dataset
 str(learning2014)
 
 #Exclude observations where the exam points variable is zero.
-
 learning2014 <- filter(learning2014, Points != 0)
 
 
