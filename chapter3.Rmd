@@ -24,10 +24,9 @@ https://github.com/rsund/IODS-project/raw/master/data/alc.csv
 
 (In the above linked file, the column separator is a comma and the first row includes the column names).
 
+---
+
 Print out the names of the variables in the data and describe the data set briefly, assuming the reader has no previous knowledge of it. There is information related to the data here. (0-1 point)
-
-
-In the data frame 'alc' there are	370 observations of 51 variables.
 
 "This data approach student achievement in secondary education of two Portuguese schools. The data attributes include student grades, demographic, social and school related features) and it was collected by using school reports and questionnaires. Two datasets are provided regarding the performance in two distinct subjects: Mathematics (mat) and Portuguese language (por). 
 
@@ -35,11 +34,105 @@ In the data frame 'alc' there are	370 observations of 51 variables.
 
 Source: [https://archive.ics.uci.edu/ml/datasets/Student+Performance#]
 
+In the data frame 'alc' there are	370 observations of 51 variables.
+
+
 ```{r}
 alc <- read.table("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
 str(alc)
-
 colnames(alc)
+
+```
+
+## 3
+
+The purpose of your analysis is to study the relationships between high/low alcohol consumption and some of the other variables in the data. To do this, choose 4 interesting variables in the data and for each of them, present your personal hypothesis about their relationships with alcohol consumption. (0-1 point)
+
+I chose student's sex, the quality of their family realtionships, and parents educational backround to observe in relation to the use of alcohol. 
+
+alc$high_use (logi) The variable high_use is a logical one: TRUE/FALSE. 
+
+alc$sex (chr) student's sex (binary: 'F' - female or 'M' - male)
+alc$famrel (int) quality of family relationships (numeric: from 1 - very bad to 5 - excellent)
+alc$Medu (int) mother's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
+alc$Fedu (int)  father's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
+
+My hypotheses are: 
+I. The sex male predicts high alcohol use
+II. The poor quality (values 1 & 2) of family relationships predict high alcohol use
+III. Mothers low educational level (values 0-2) predicts high alcohol use
+IV. Fathers low educational level (values 0-2) predicts high alcohol use
+
+
+
+```{r}
+
+summary(alc$sex)
+summary(alc$famrel)
+summary(alc$Medu)
+summary(alc$Fedu)
+
+
+```
+
+
+## 4
+
+Numerically and graphically explore the distributions of your chosen variables and their relationships with alcohol consumption (use for example cross-tabulations, bar plots and box plots). Comment on your findings and compare the results of your exploration to your previously stated hypotheses. (0-5 points)
+
+```{r}
+
+
+```
+
+
+## 5
+
+Use logistic regression to statistically explore the relationship between your chosen variables and the binary high/low alcohol consumption variable as the target variable. 
+
+Present and interpret a summary of the fitted model. Present and interpret the coefficients of the model as odds ratios and provide confidence intervals for them. Interpret the results and compare them to your previously stated hypothesis. 
+
+Hint: If your model includes factor variables see for example the first answer of this stackexchange thread on how R treats and how you should interpret these variables in the model output (or use some other resource to study this). (0-5 points)
+
+
+```{r}
+
+
+
+```
+
+
+## 6
+
+Using the variables which, according to your logistic regression model, had a statistical relationship with high/low alcohol consumption, explore the predictive power of you model. 
+
+Provide a 2x2 cross tabulation of predictions versus the actual values and optionally display a graphic visualizing both the actual values and the predictions. 
+
+Compute the total proportion of inaccurately classified individuals (= the training error) and comment on all the results. Compare the performance of the model with performance achieved by some simple guessing strategy. (0-3 points)
+
+```{r}
+
+
+
+```
+
+## 7
+
+Bonus: Perform 10-fold cross-validation on your model. Does your model have better test set performance (smaller prediction error using 10-fold cross-validation) compared to the model introduced in DataCamp (which had about 0.26 error). Could you find such a model? (0-2 points to compensate any loss of points from the above exercises)
+
+
+```{r}
+
+
+```
+
+## 8
+
+Super-Bonus: Perform cross-validation to compare the performance of different logistic regression models (= different sets of predictors). Start with a very high number of predictors and explore the changes in the training and testing errors as you move to models with less predictors. Draw a graph displaying the trends of both training and testing errors by the number of predictors in the model. (0-4 points to compensate any loss of points from the above exercises)
+
+
+```{r}
+
 
 ```
 
