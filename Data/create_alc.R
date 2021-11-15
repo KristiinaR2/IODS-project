@@ -10,21 +10,28 @@ library(ggplot2)
 setwd("C:/LocalData/krraiha/Opiskelu HY/Jatko-opinnot/IODS-project/Data")
 getwd()
 
-math <- read.csv2("student-mat.csv")
-str(mat)
+#math <- read.csv2("student-mat.csv") #this works also?
+math <- read.table("student-mat.csv", sep = ";" , header=TRUE)
+str(math)
 
-por <- read.csv2("student-por.csv")
+#df math:	395 obs. of  33 variables:
+
+#por <- read.csv2("student-por.csv")
+por <- read.table("student-por.csv", sep = ";" , header=TRUE)
 str(por)
+
+#df por: 649 obs. of  33 variables
 
 #Join the two data sets using all other variables than 
 #"failures", "paid", "absences", "G1", "G2", "G3" 
-#"as (student) identifiers. 
+#"as (student) identifiers.
+
 #Keep only the students present in both data sets (take a look at code here). 
 #Explore the structure and dimensions of the joined data. (1 point)
 
 # Define own id for both datasets
-por_id <- por %>% mutate(id=1000+row_number()) 
-math_id <- math %>% mutate(id=2000+row_number())
+por_id <- por %>% mutate(id=1000+row_number())#1000? 
+math_id <- math %>% mutate(id=2000+row_number())#what is the 2000 here?
 
 # Which columns vary in datasets
 free_cols <- c("id","failures","paid","absences","G1","G2","G3")
