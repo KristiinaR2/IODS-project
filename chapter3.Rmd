@@ -1,0 +1,45 @@
+---
+title: "chapter3.Rmd"
+author: "Kristiina"
+date: "12 11 2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(dplyr)
+library(GGally)
+library(ggplot2)
+
+setwd("C:/LocalData/krraiha/Opiskelu HY/Jatko-opinnot/IODS-project/Data")
+
+```
+
+## 2
+
+Read the joined student alcohol consumption data into R either from your local folder (if you completed the Data Wrangling part) or from this url: 
+https://github.com/rsund/IODS-project/raw/master/data/alc.csv
+
+(In the above linked file, the column separator is a comma and the first row includes the column names).
+
+Print out the names of the variables in the data and describe the data set briefly, assuming the reader has no previous knowledge of it. There is information related to the data here. (0-1 point)
+
+
+In the data frame 'alc' there are	370 observations of 51 variables.
+
+"This data approach student achievement in secondary education of two Portuguese schools. The data attributes include student grades, demographic, social and school related features) and it was collected by using school reports and questionnaires. Two datasets are provided regarding the performance in two distinct subjects: Mathematics (mat) and Portuguese language (por). 
+
+"In [Cortez and Silva, 2008], the two datasets were modeled under binary/five-level classification and regression tasks. Important note: the target attribute G3 has a strong correlation with attributes G2 and G1. This occurs because G3 is the final year grade (issued at the 3rd period), while G1 and G2 correspond to the 1st and 2nd period grades. It is more difficult to predict G3 without G2 and G1, but such prediction is much more useful (see paper source for more details)." 
+
+Source: [https://archive.ics.uci.edu/ml/datasets/Student+Performance#]
+
+```{r}
+alc <- read.table("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
+str(alc)
+
+colnames(alc)
+
+```
+
