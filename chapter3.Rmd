@@ -115,6 +115,9 @@ alc %>%
 #Bar plot of 'high_use' by sex
 ggplot(alc, aes(high_use)) + facet_wrap("sex") + geom_bar()
 
+#Line plot 
+
+
 
 # 2. Family relationships 
 
@@ -124,6 +127,19 @@ ggplot(data = alc, aes(x = famrel))+ geom_bar()
 
 #Plot of 'high_use' by family relations
 ggplot(alc, aes(high_use)) + facet_wrap("famrel") + geom_bar()
+
+alc_agg <- alc %>%
+  group_by(sex, high_use)%>%
+  summarise(famrel_mean = round(mean(famrel), digits = 2),
+            medu_mean = round(mean(Medu), digits = 2),
+            fedu_mean = round(mean(Fedu), digits = 2),
+             n=n())
+
+alc_agg %>%
+  ggplot(aes(high_use, famrel_mean, group = sex, colour = sex)) + 
+  geom_line(alpha=.7) + 
+  geom_point() + theme_classic()
+
 
 
 # 3. Mothers education
