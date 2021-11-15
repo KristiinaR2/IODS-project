@@ -79,36 +79,31 @@ Numerically and graphically explore the distributions of your chosen variables a
 
 The alcohol consumption (range 1-5) frequency is highest at the smallest numbers (where can i find explanations for these numbers??). 
 
-The frequency in the high-use category is lower than in the low-use (high use n=111, low-use n=259). 
-The sexes are almost equally distributed, (f=195, m=175). The family relations are bad only in 9,5% of the cases (n (1-2)= 36, n (3-5) = 344). The educational level of the mothers in a bit higher that the fathers. 
+The frequency in the high-use category is lower than in the low-use (high use n=111, low-use n=259). The sexes are almost equally distributed, (f=195, m=175). 
+
+The family relations are bad in 9,5% of the cases (n (1-2)= 36, n (3-5) = 344). The distribution of the familyrelationship points shows that the 
+
+The educational level of the mothers in a bit higher that the fathers. 
 
 The frequency of high usage is higher with the male group (males: high-use n= 70, low-use n=105), than females (females: high-use n= 41, low-use n=154).
 
 The means of the family relations and mothers’ education are higher in the low-usage group. The mean of fathers’ education is slightly higher in the high-use group. The difference is in the high-use female group: the mean of the fathers education is higher in the high-use group, as for the males in high-use group the mean of the fathers education is lower.
 
-As for the hypotheses I set earlier, the male sex seems to be associated with a higher frequency of alcohol use (I), as does the poorer quality of family relationships (II) and mothers lower educational level (III), but the fathers educational level is not associated with the lower alcohol consumption in females (IV).
-
+As for the hypotheses I set earlier, according to the means and distributions of the frequencies, the male sex seems to be associated with a higher frequency of alcohol use (I), as does the poorer quality of family relationships (II) and mothers lower educational level (III), but the fathers educational level is not associated with the lower alcohol consumption in females (IV).
 
 
 ```{r}
-# define a new logical column 'high_use'
-#alc <- mutate(alc, high_use = alc_use > 2)
-#alc <- mutate(alc, low_use = alc_use <= 2)
 
 #Alcohol use & high_use
-summary(alc$alc_use)
-
 ggplot(data = alc, aes(x = alc_use))+ geom_bar()
 ggplot(data = alc, aes(x = high_use))+ geom_bar()
 
+# The counts of different groups
 alc %>% group_by(high_use) %>% summarise(count = n())
 alc %>% group_by(high_use, sex) %>% summarise(count = n())
-alc %>% group_by(sex) %>% summarise(count = n())
-alc %>% group_by(famrel) %>% summarise(count = n())
-alc %>% group_by(Medu) %>% summarise(count = n())
-alc %>% group_by(Fedu) %>% summarise(count = n())
 
 
+# The aggregate data and the data frames
 alc_agg <- alc %>%
   group_by(high_use, sex)%>%
   summarise(alc_use_mean = round(mean(alc_use), digits = 2),
@@ -123,7 +118,7 @@ alc_agg <- alc %>%
 alc_agg
 
 alc_agg2 <- alc %>%
-  group_by(sex)%>%
+  group_by(high_use)%>%
   summarise(alc_use_mean = round(mean(alc_use), digits = 2),
             alc_use_sd = round(sd(alc_use), digits = 2),
             famrel_mean = round(mean(famrel), digits = 2),
@@ -135,37 +130,42 @@ alc_agg2 <- alc %>%
              n=n())
 alc_agg2
 
-alc_agg3 <- alc %>%
-  group_by(high_use)%>%
-  summarise(alc_use_mean = round(mean(alc_use), digits = 2),
-            alc_use_sd = round(sd(alc_use), digits = 2),
-            famrel_mean = round(mean(famrel), digits = 2),
-            famrel_sd = round(sd(famrel), digits = 2),
-            medu_mean = round(mean(Medu), digits = 2),
-            medu_sd = round(sd(Medu), digits = 2),
-            fedu_mean = round(mean(Fedu), digits = 2),
-            fedu_sd = round(sd(Fedu), digits = 2),
-             n=n())
-alc_agg3
+```
 
-# 1. Sex
+## 1. Sex 
+
+```{r}
 
 summary(alc$sex)
+
+# The frequencies & and the relative frequencies and the bar plots of high-use/low-use in the group sex 
+
+table(alc$high_use, alc$sex)
+
+round(prop.table(table(alc$high_use, alc$sex),2)*100)
+
+alc %>% group_by(high_use, sex) %>% summarise(count = n())%>%ungroup()
+
 ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~sex)
 
-#Boxplot alcohol usage by sex 
 alc %>%
   ggplot(aes(high_use, alc_use)) + 
   geom_boxplot(fill="red", alpha=0.2) + facet_wrap(~sex)
 
-#Bar plot of 'high_use' by sex
-ggplot(alc, aes(high_use)) + facet_wrap("sex") + geom_bar()
+```
 
+## 2. Family relationships 
 
-
-# 2. Family relationships 
+```{r}
 
 summary(alc$famrel)
+
+# The frequencies & percentages of high-use by the different family relation points
+table(alc$high_use, alc$famrel)
+prop.table(table(alc$high_use, alc$famrel))*100
+
+# Plots 
+
 ggplot(data = alc, aes(x = famrel))+ geom_bar()
 ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~famrel)
 
@@ -174,10 +174,19 @@ alc_agg %>%
   geom_line(alpha=.7) + 
   geom_point() + theme_classic()
 
+```
 
-# 3. Mothers education
+## 3. Mothers education
+
+```{r}
 
 summary(alc$Medu)
+
+# The frequencies & percentages of high-use by the different mothers educational background points
+table(alc$high_use, alc$Medu)
+prop.table(table(alc$high_use, alc$Medu))*100
+
+# Plots
 ggplot(data = alc, aes(x = Medu))+ geom_bar()
 ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~Medu)
 
@@ -186,9 +195,19 @@ alc_agg %>%
   geom_line(alpha=.7) + 
   geom_point() + theme_classic()
 
-# 4. Fathers education
+```
+
+## 4. Fathers education
+
+```{r}
 
 summary(alc$Fedu)
+
+# The frequencies & percentages of high-use by the different fathers educational background points
+table(alc$high_use, alc$Fedu)
+prop.table(table(alc$high_use, alc$Fedu))*100
+
+#Plots 
 ggplot(data = alc, aes(x = Fedu))+ geom_bar()
 ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~Fedu)
 
@@ -196,7 +215,6 @@ alc_agg %>%
   ggplot(aes(high_use, fedu_mean, group = sex, colour = sex)) + 
   geom_line(alpha=.7) + 
   geom_point() + theme_classic()
-
 
 
 ```
