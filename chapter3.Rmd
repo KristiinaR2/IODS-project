@@ -75,7 +75,6 @@ summary(alc$alc_use)
 
 ## 4
 
-Numerically and graphically explore the distributions of your chosen variables and their relationships with alcohol consumption (use for example cross-tabulations, bar plots and box plots). Comment on your findings and compare the results of your exploration to your previously stated hypotheses. (0-5 points)
 
 The alcohol consumption (range 1-5) frequency is highest at the smallest numbers (where can i find explanations for these numbers??). 
 
