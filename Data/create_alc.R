@@ -14,6 +14,7 @@ getwd()
 math <- read.table("student-mat.csv", sep = ";" , header=TRUE)
 str(math)
 
+
 #df math:	395 obs. of  33 variables:
 
 #por <- read.csv2("student-por.csv")
