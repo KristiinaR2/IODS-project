@@ -38,7 +38,11 @@ In the data frame 'alc' there are	370 observations of 51 variables.
 
 
 ```{r}
-alc <- read.table("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
+#alc <- read.table("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
+#str(alc)
+#colnames(alc)
+
+alc <- read.csv2("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
 str(alc)
 colnames(alc)
 
@@ -61,8 +65,8 @@ alc$Fedu (int)  father's education (numeric: 0 - none, 1 - primary education (4t
 My hypotheses are: 
 I. The sex male predicts high alcohol use
 II. The poor quality (values 1 & 2) of family relationships predicts high alcohol use
-III. Mothers low educational level (values 0-2) predicts high alcohol use
-IV. Fathers low educational level (values 0-2) predicts high alcohol use
+III. Mothers low educational level predicts high alcohol use
+IV. Fathers low educational level predicts high alcohol use
 
 ```{r}
 gather(alc) %>% glimpse
@@ -75,14 +79,9 @@ summary(alc$alc_use)
 
 ## 4
 
+The frequency of observations in the high-use category is lower than in the low-use (high use n=111, low-use n=259). The sexes are almost equally distributed, (f=195, m=175). 
 
-The alcohol consumption (range 1-5) frequency is highest at the smallest numbers (where can i find explanations for these numbers??). 
-
-The frequency in the high-use category is lower than in the low-use (high use n=111, low-use n=259). The sexes are almost equally distributed, (f=195, m=175). 
-
-The family relations are bad in 9,5% of the cases (n (1-2)= 36, n (3-5) = 344). The distribution of the familyrelationship points shows that the 
-
-The educational level of the mothers in a bit higher that the fathers. 
+The distribution of the family relationship points shows that the values 4 and 5 have the most observations, and the family relations are bad in minority of the cases (n (1-2)= 36, n (3-5) = 344). The distribution of parents educational level shows that the educational level of mothers in a bit higher that the fathers. 
 
 The frequency of high usage is higher with the male group (males: high-use n= 70, low-use n=105), than females (females: high-use n= 41, low-use n=154).
 
@@ -118,8 +117,7 @@ alc_agg
 
 alc_agg2 <- alc %>%
   group_by(high_use)%>%
-  summarise(alc_use_mean = round(mean(alc_use), digits = 2),
-            alc_use_sd = round(sd(alc_use), digits = 2),
+  summarise(
             famrel_mean = round(mean(famrel), digits = 2),
             famrel_sd = round(sd(famrel), digits = 2),
             medu_mean = round(mean(Medu), digits = 2),
@@ -147,9 +145,6 @@ alc %>% group_by(high_use, sex) %>% summarise(count = n())%>%ungroup()
 
 ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~sex)
 
-alc %>%
-  ggplot(aes(high_use, alc_use)) + 
-  geom_boxplot(fill="red", alpha=0.2) + facet_wrap(~sex)
 
 ```
 
@@ -227,10 +222,27 @@ Present and interpret a summary of the fitted model. Present and interpret the c
 
 Hint: If your model includes factor variables see for example the first answer of this stackexchange thread on how R treats and how you should interpret these variables in the model output (or use some other resource to study this). (0-5 points)
 
+"the exponents of the coefficients of a logistic regression model can be interpret as odds ratios between a unit change (vs no change) in the corresponding explanatory variable."
+
+alc$sex (chr) student's sex (binary: 'F' - female or 'M' - male)
+alc$famrel (int) quality of family relationships (numeric: from 1 - very bad to 5 - excellent)
+alc$Medu (int) mother's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
+alc$Fedu (int)  father's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
+
 
 ```{r}
 
+m <- glm(high_use ~ sex + famrel + Medu + Fedu, data = alc, family = "binomial")
+summary(m)
 
+# compute odds ratios (OR)
+OR <- coef(m) %>% exp
+
+# compute confidence intervals (CI)
+CI <- confint(m) %>% exp
+
+# print out the odds ratios with their confidence intervals
+cbind(OR, CI)
 
 ```
 
