@@ -38,8 +38,9 @@ In the data frame 'alc' there are	370 observations of 51 variables.
 
 
 ```{r}
-#alc <- read.table("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
-#str(alc)
+alc2 <- read.table("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
+str(alc2)
+
 #colnames(alc)
 
 alc <- read.csv2("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
@@ -52,11 +53,9 @@ colnames(alc)
 
 The purpose of your analysis is to study the relationships between high/low alcohol consumption and some of the other variables in the data. To do this, choose 4 interesting variables in the data and for each of them, present your personal hypothesis about their relationships with alcohol consumption. (0-1 point)
 
-I chose student's sex, the quality of their family realtionships, and parents educational backround to observe in relation to the use of alcohol. 
+I chose student's sex, the quality of their family relationships, and parents educational background to observe in relation to the use of alcohol. 
 
-alc$alc_use ()
 alc$high_use (logi) The variable high_use is a logical one: TRUE/FALSE. 
-
 alc$sex (chr) student's sex (binary: 'F' - female or 'M' - male)
 alc$famrel (int) quality of family relationships (numeric: from 1 - very bad to 5 - excellent)
 alc$Medu (int) mother's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
@@ -64,9 +63,9 @@ alc$Fedu (int)  father's education (numeric: 0 - none, 1 - primary education (4t
 
 My hypotheses are: 
 I. The sex male predicts high alcohol use
-II. The poor quality (values 1 & 2) of family relationships predicts high alcohol use
-III. Mothers low educational level predicts high alcohol use
-IV. Fathers low educational level predicts high alcohol use
+II. The quality of family relationships predicts high alcohol use
+III. Mothers educational level predicts high alcohol use
+IV. Fathers educational level predicts high alcohol use
 
 ```{r}
 gather(alc) %>% glimpse
@@ -133,8 +132,6 @@ alc_agg2
 
 ```{r}
 
-summary(alc$sex)
-
 # The frequencies & and the relative frequencies and the bar plots of high-use/low-use in the group sex 
 
 table(alc$high_use, alc$sex)
@@ -152,29 +149,25 @@ ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~sex)
 
 ```{r}
 
-summary(alc$famrel)
-
 # The frequencies & percentages of high-use by the different family relation points
 table(alc$high_use, alc$famrel)
 prop.table(table(alc$high_use, alc$famrel))*100
 
 # Plots 
-
 ggplot(data = alc, aes(x = famrel))+ geom_bar()
 ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~famrel)
+
+ggplot(alc, aes(x = high_use, y = Medu, col = sex)) + geom_boxplot() + ylab("famrel") + ggtitle("Student alcohol consumption by family relations")
 
 alc_agg %>%
   ggplot(aes(high_use, famrel_mean, group = sex, colour = sex)) + 
   geom_line(alpha=.7) + 
   geom_point() + theme_classic()
-
 ```
 
 ## 3. Mothers education
 
 ```{r}
-
-summary(alc$Medu)
 
 # The frequencies & percentages of high-use by the different mothers educational background points
 table(alc$high_use, alc$Medu)
@@ -183,6 +176,8 @@ prop.table(table(alc$high_use, alc$Medu))*100
 # Plots
 ggplot(data = alc, aes(x = Medu))+ geom_bar()
 ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~Medu)
+
+ggplot(alc, aes(x = high_use, y = Medu, col = sex)) + geom_boxplot() + ylab("Fedu") + ggtitle("Student alcohol consumption by mothers educational level")
 
 alc_agg %>%
   ggplot(aes(high_use, medu_mean, group = sex, colour = sex)) + 
@@ -194,8 +189,6 @@ alc_agg %>%
 ## 4. Fathers education
 
 ```{r}
-
-summary(alc$Fedu)
 
 # The frequencies & percentages of high-use by the different fathers educational background points
 table(alc$high_use, alc$Fedu)
@@ -210,6 +203,8 @@ alc_agg %>%
   geom_line(alpha=.7) + 
   geom_point() + theme_classic()
 
+ggplot(alc, aes(x = high_use, y = Fedu, col = sex)) + geom_boxplot() + ylab("Fedu") + ggtitle("Student alcohol consumption by fathers educational level")
+
 
 ```
 
@@ -218,9 +213,23 @@ alc_agg %>%
 
 Use logistic regression to statistically explore the relationship between your chosen variables and the binary high/low alcohol consumption variable as the target variable. 
 
-Present and interpret a summary of the fitted model. Present and interpret the coefficients of the model as odds ratios and provide confidence intervals for them. Interpret the results and compare them to your previously stated hypothesis. 
+a) Present and interpret a summary of the fitted model. 
+
+
+b) Present and interpret the coefficients of the model as odds ratios and provide confidence intervals for them. 
+
+
+c) Interpret the results and compare them to your previously stated hypothesis. 
+
+My hypotheses were: 
+I. The sex male predicts high alcohol use
+II. The quality of family relationships predicts high alcohol use
+III. Mothers educational level predicts high alcohol use
+IV. Fathers educational level predicts high alcohol use
+
 
 Hint: If your model includes factor variables see for example the first answer of this stackexchange thread on how R treats and how you should interpret these variables in the model output (or use some other resource to study this). (0-5 points)
+
 
 "the exponents of the coefficients of a logistic regression model can be interpret as odds ratios between a unit change (vs no change) in the corresponding explanatory variable."
 
@@ -244,6 +253,8 @@ CI <- confint(m) %>% exp
 # print out the odds ratios with their confidence intervals
 cbind(OR, CI)
 
+
+
 ```
 
 
@@ -255,8 +266,30 @@ Provide a 2x2 cross tabulation of predictions versus the actual values and optio
 
 Compute the total proportion of inaccurately classified individuals (= the training error) and comment on all the results. Compare the performance of the model with performance achieved by some simple guessing strategy. (0-3 points)
 
+
 ```{r}
 
+m2 <- glm(high_use ~ sex + famrel, data = alc, family = "binomial")
+summary(m2)
+
+OR2 <- coef(m2) %>% exp
+CI2 <- confint(m2) %>% exp
+cbind(OR2, CI2)
+
+# predict() the probability of high_use
+probabilities <- predict(m2, type = "response")
+
+# add the predicted probabilities to 'alc'
+alc <- mutate(alc, probability = probabilities)
+
+# use the probabilities to make a prediction of high_use
+alc <- mutate(alc, prediction = probability > 0.5)
+
+# see the last ten original classes, predicted probabilities, and class predictions
+select(alc, high_use, sex, famrel, prediction) %>% tail(10)
+
+# tabulate the target variable versus the predictions
+table(high_use = alc$high_use, prediction = alc$prediction)
 
 
 ```
