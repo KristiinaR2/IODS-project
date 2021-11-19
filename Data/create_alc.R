@@ -76,13 +76,37 @@ glimpse(alc)
 #         Original joining/merging example is erroneous!
 
 --- 
-  #Join the two data sets using all other variables than 
-  #"failures", "paid", "absences", "G1", "G2", "G3" as (student) identifiers.
   
-  #Keep only the students present in both data sets (take a look at code here). 
-  #Explore the structure and dimensions of the joined data. (1 point)
+#Join the two data sets using all other variables than 
+#"failures", "paid", "absences", "G1", "G2", "G3" as (student) identifiers.
   
-  # Define own id for both datasets
+#Keep only the students present in both data sets (take a look at code here). 
+#Explore the structure and dimensions of the joined data. (1 point)
+  
+source <- "http://archive.ics.uci.edu/ml/machine-learning-databases/00320/student.zip"
+dest <- "~/IODS-project/data/student.zip"
+
+# Load Data from the web and unzip it
+setwd("~/IODS-project")
+download.file(source,dest)
+unzip(dest,exdir="~/IODS-project/data/student")
+
+# Download also the paper in which data were originally used
+download.file(paper,"~/IODS-project/data/student/student.pdf")
+
+# read the datasets into memory
+por <- read.table("~/IODS-project/data/student/student-por.csv", sep = ";", header=TRUE)
+math <- read.table("~/IODS-project/data/student/student-mat.csv", sep = ";", header=TRUE)
+
+# Define own id for both datasets
+library(dplyr)
+por_id <- por %>% mutate(id=1000+row_number()) 
+math_id <- math %>% mutate(id=2000+row_number())
+
+# Which columns vary in datasets
+free_cols <- c("id","failures","paid","absences","G1","G2","G3")
+
+# Define own id for both datasets
 por_id <- por %>% mutate(id=1000+row_number())#1000? 
 math_id <- math %>% mutate(id=2000+row_number())#what is the 2000 here?
 
