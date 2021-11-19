@@ -1,7 +1,7 @@
 ---
 title: "chapter3.Rmd"
 author: "Kristiina"
-date: "12 11 2021"
+date: "19 11 2021"
 output: html_document
 ---
 
@@ -17,20 +17,7 @@ setwd("C:/LocalData/krraiha/Opiskelu HY/Jatko-opinnot/IODS-project/Data")
 
 ```
 
-## 2
-
-Read the joined student alcohol consumption data into R either from your local folder (if you completed the Data Wrangling part) or from this url: 
-https://github.com/rsund/IODS-project/raw/master/data/alc.csv
-
-(In the above linked file, the column separator is a comma and the first row includes the column names).
-
----
-
-Print out the names of the variables in the data and describe the data set briefly, assuming the reader has no previous knowledge of it. There is information related to the data here. (0-1 point)
-
-"This data approach student achievement in secondary education of two Portuguese schools. The data attributes include student grades, demographic, social and school related features) and it was collected by using school reports and questionnaires. Two datasets are provided regarding the performance in two distinct subjects: Mathematics (mat) and Portuguese language (por). 
-
-"In [Cortez and Silva, 2008], the two datasets were modeled under binary/five-level classification and regression tasks. Important note: the target attribute G3 has a strong correlation with attributes G2 and G1. This occurs because G3 is the final year grade (issued at the 3rd period), while G1 and G2 correspond to the 1st and 2nd period grades. It is more difficult to predict G3 without G2 and G1, but such prediction is much more useful (see paper source for more details)." 
+## 2 The data
 
 Source: [https://archive.ics.uci.edu/ml/datasets/Student+Performance#]
 
@@ -63,9 +50,7 @@ str(alc2)
 
 ```
 
-## 3
-
-The purpose of your analysis is to study the relationships between high/low alcohol consumption and some of the other variables in the data. To do this, choose 4 interesting variables in the data and for each of them, present your personal hypothesis about their relationships with alcohol consumption. (0-1 point)
+## 3 The hypotheses
 
 I chose student's sex, the quality of their family relationships, and parents educational background to observe in relation to the use of alcohol. 
 
@@ -84,17 +69,7 @@ gather(alc2) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_
 ```
 
 
-## 4
-
-The frequency of observations in the high-use category is lower than in the low-use (high use n=111, low-use n=259). The sexes are almost equally distributed, (f=195, m=175). 
-
-The distribution of the family relationship points shows that the values 4 and 5 have the most observations, and the family relations are bad in minority of the cases (n (1-2)= 36, n (3-5) = 344). The distribution of parents educational level shows that the educational level of mothers in a bit higher that the fathers. 
-
-The frequency of high usage is higher with the male group (males: high-use n= 70, low-use n=105), than females (females: high-use n= 41, low-use n=154).
-
-The means of the family relations and mothers’ education are higher in the low-usage group. The mean of fathers’ education is slightly higher in the high-use group. The difference is in the high-use female group: the mean of the fathers education is higher in the high-use group, as for the males in high-use group the mean of the fathers education is lower.
-
-As for the hypotheses I set earlier, according to the means and distributions of the frequencies, the male sex seems to be associated with a higher frequency of alcohol use (I), as does the poorer quality of family relationships (II) and mothers lower educational level (III), but the fathers educational level is not associated with the lower alcohol consumption in females (IV).
+## 4 The variables
 
 
 ```{r}
@@ -123,7 +98,7 @@ alc_agg2
 
 ```
 
-## 1. Sex 
+### 1. Sex 
 
 ```{r}
 
@@ -140,7 +115,7 @@ ggplot(data = alc2, aes(x = high_use))+ geom_bar() + facet_wrap(~sex)
 
 ```
 
-## 2. Family relationships 
+### 2. Family relationships 
 
 ```{r}
 
@@ -158,7 +133,7 @@ alc_agg %>%
   geom_point() + theme_classic()
 ```
 
-## 3. Mothers education
+### 3. Mothers education
 
 ```{r}
 
@@ -177,7 +152,7 @@ alc_agg %>%
 
 ```
 
-## 4. Fathers education
+### 4. Fathers education
 
 ```{r}
 
@@ -199,7 +174,7 @@ alc_agg %>%
 
 ```
 
-## Summary of the data and the chosen variables
+### Summary of the data and the chosen variables
 
 The frequency of observations in the high-use category is lower than in the low-use (high use n=111, low-use n=259). The sexes are almost equally distributed, (f=195, m=175). 
 
@@ -214,53 +189,45 @@ As for the hypotheses I set earlier, according to the means and distributions of
 
 ## 5 The model
 
-Use logistic regression to statistically explore the relationship between your chosen variables and the binary high/low alcohol consumption variable as the target variable. 
+In the first model m = (high_use ~ sex + famrel + Medu + Fedu) only the sex was statistically significant. (Here, the sex male = 1, as the sex female = 0) 
 
-a) Present and interpret a summary of the fitted model. 
+The deviance residuals of the model are quite close to 0, and roughly symmetrical, but lean on the max values. After excluding the famrel, medu and fedu from the model (m2), the AIC (435.26) is still almost the same as it was in the previous model (438.88).
 
+In the second fitted model m2 (high_use ~ sex, data = alc2) the coefficients show, that the estimate for male high alcohol being use is 0.9179 (p<.000), that indicates the odds of a males high alcohol consumption over the odds of a females high alcohol consumption.
 
-b) Present and interpret the coefficients of the model as odds ratios and provide confidence intervals for them. 
+High-use log(odds) male = -1.3234 + 0.9179 * 1 = -0.4055
+High-use log(odds) female = -1.3234 + 0.9179 * 0 = -1.3234
 
+The odds ratio (OR) is 2,5 (CI[1,59 - 3,98]), that indicates there is a positive association with the sex (male) and high alcohol consumption. 
 
 "the exponents of the coefficients of a logistic regression model can be interpret as odds ratios between a unit change (vs no change) in the corresponding explanatory variable."
 
-
-c) Interpret the results and compare them to your previously stated hypothesis. 
-
 My hypotheses were: 
+
 I. The sex male predicts high alcohol use
 II. The quality of family relationships predicts high alcohol use
 III. Mothers educational level predicts high alcohol use
 IV. Fathers educational level predicts high alcohol use
 
-
-Hint: If your model includes factor variables see for example the first answer of this stackexchange thread on how R treats and how you should interpret these variables in the model output (or use some other resource to study this). (0-5 points)
-
-
-alc$sex (chr) student's sex (binary: 'F' - female or 'M' - male)
-alc$famrel (int) quality of family relationships (numeric: from 1 - very bad to 5 - excellent)
-alc$Medu (int) mother's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
-alc$Fedu (int)  father's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
+According to the logistic regression model the sex of the subjects has a statistical relationship with high/low alcohol consumption: the odds of the male of high alcohol consumption are bigger than in females. The first hypothesis was confirmed, the others can be refuted.
 
 
 ```{r}
 
-
-
-
-m <- glm(high_use ~ sex + famrel + Medu + Fedu, data = alc, family = "binomial")
+m <- glm(high_use ~ sex + famrel + Medu + Fedu, data = alc2, family = "binomial")
 summary(m)
 
+m2 <- glm(high_use ~ sex, data = alc2, family = "binomial")
+summary(m2)
 
-# compute odds ratios (OR)
-OR <- coef(m) %>% exp
+# odds ratios (OR) and confidence intervals (CI)
+OR <- coef(m2) %>% exp
+OR # = 2,5 (sexM)
 
-# compute confidence intervals (CI)
-CI <- confint(m) %>% exp
+CI <- confint(m2) %>% exp
+CI # 1,59 - 3,98
 
-# print out the odds ratios with their confidence intervals
 cbind(OR, CI)
-
 
 
 ```
@@ -268,47 +235,27 @@ cbind(OR, CI)
 
 ## 6 The predictive power of the model
 
-According to the previous logistic regression model the sex (M) and family relations had a statistical relationship with high/low alcohol consumption. 
-
-The model (m2) shows that the AIC (435.26) is almost the same as it was in the previous model (438.88).
-
-
-Using the variables which, according to your logistic regression model, had a statistical relationship with high/low alcohol consumption, explore the predictive power of you model. 
-
-Provide a 2x2 cross tabulation of predictions versus the actual values and optionally display a graphic visualizing both the actual values and the predictions. 
-
-Compute the total proportion of inaccurately classified individuals (= the training error) and comment on all the results. Compare the performance of the model with performance achieved by some simple guessing strategy. (0-3 points)
-
+The average number of wrong predictions in the cross validation is 0.31. 
 
 ```{r}
-
-m2 <- glm(high_use ~ sex + famrel, data = alc, family = "binomial")
-summary(m2)
-
-OR2 <- coef(m2) %>% exp
-CI2 <- confint(m2) %>% exp
-cbind(OR2, CI2)
 
 # Predict() the probability of high_use
 probabilities <- predict(m2, type = "response")
 
 # Add the predicted probabilities to 'alc'
-alc <- mutate(alc, probability = probabilities)
+alc2 <- mutate(alc2, probability = probabilities)
 
 # The probabilities to make a prediction of high_use
-alc <- mutate(alc, prediction = probability > 0.5)
-
-# The last ten original classes, predicted probabilities, and class predictions
-select(alc, high_use, sex, famrel, prediction) %>% tail(10)
+alc2 <- mutate(alc2, prediction = probability > 0.5)
 
 # The target variable versus the predictions
-table(high_use = alc$high_use, prediction = alc$prediction)
+table(high_use = alc2$high_use, prediction = alc2$prediction)
 
 # A plot of 'high_use' versus 'probability' in 'alc', define the geom as points and draw the plot
-ggplot(alc, aes(x = probability, y = high_use, col = prediction))+ geom_point()
+ggplot(alc2, aes(x = probability, y = high_use, col = prediction))+ geom_point()
 
 # tabulate the target variable versus the predictions
-table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table %>% addmargins
+table(high_use = alc2$high_use, prediction = alc2$prediction) %>% prop.table %>% addmargins
 
 # define a loss function (average prediction error)
 loss_func <- function(class, prob) {
@@ -317,16 +264,29 @@ loss_func <- function(class, prob) {
 }
 
 # call loss_func to compute the average number of wrong predictions in the (training) data
-loss_func(class = alc$high_use, prob = alc$probability)
-
+loss_func(class = alc2$high_use, prob = alc2$probability)
 
 # K-fold cross-validation
 library(boot)
-cv <- cv.glm(data = alc, cost = loss_func, glmfit = m, K = 10)
+cv <- cv.glm(data = alc2, cost = loss_func, glmfit = m, K = 10)
 
 # average number of wrong predictions in the cross validation
 cv$delta[1]
 
+######
+#I found an applied this demo script from here:  https://github.com/StatQuest/logistic_regression_demo/blob/master/logistic_regression_demo.R
+
+predicted.data <- data.frame(
+  probability.of.high.a = m2$fitted.values,
+  sex=alc2$sex)
+
+ggplot(data=predicted.data, aes(x=sex, y=probability.of.high.a)) +
+  geom_point(aes(color=sex), size=5) +
+  xlab("Sex") +
+  ylab("Predicted probability of high alcohol consumption")
+
+
+######
 
 ```
 
@@ -335,18 +295,9 @@ cv$delta[1]
 Bonus: Perform 10-fold cross-validation on your model. Does your model have better test set performance (smaller prediction error using 10-fold cross-validation) compared to the model introduced in DataCamp (which had about 0.26 error). Could you find such a model? (0-2 points to compensate any loss of points from the above exercises)
 
 
-```{r}
-
-
-```
-
 ## 8
 
 Super-Bonus: Perform cross-validation to compare the performance of different logistic regression models (= different sets of predictors). Start with a very high number of predictors and explore the changes in the training and testing errors as you move to models with less predictors. Draw a graph displaying the trends of both training and testing errors by the number of predictors in the model. (0-4 points to compensate any loss of points from the above exercises)
 
 
-```{r}
-
-
-```
 
