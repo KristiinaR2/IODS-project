@@ -36,16 +36,30 @@ Source: [https://archive.ics.uci.edu/ml/datasets/Student+Performance#]
 
 In the data frame 'alc' there are	370 observations of 51 variables.
 
+I chose student's sex, the quality of their family relationships, and parents educational background to observe in relation to the use of alcohol. 
+
+alc$high_use (logi) The variable high_use is a logical one: TRUE/FALSE. 
+alc$sex (chr) student's sex (binary: 'F' - female or 'M' - male)
+alc$famrel (int) quality of family relationships (numeric: from 1 - very bad to 5 - excellent)
+alc$Medu (int) mother's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
+alc$Fedu (int)  father's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
+
 
 ```{r}
-alc2 <- read.table("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
-str(alc2)
-
-#colnames(alc)
 
 alc <- read.csv2("https://github.com/rsund/IODS-project/raw/master/data/alc.csv", sep = "," , header=TRUE)
 str(alc)
 colnames(alc)
+
+#Mutated famrel, medu & fedu to factors
+alc2 <- alc %>%
+  mutate(
+    famrel= factor(famrel, levels = c(1,2,3,4,5), labels = c("very bad","bad","neutral","good","very good")),
+         Medu = factor(Medu, levels = c(0,1,2,3,4), labels = c("none","primary","5-9th","sec ed", "high ed")),
+         Fedu = factor(Fedu, levels = c(0,1,2,3,4), labels = c("none","primary","5-9th","sec ed", "high ed")))
+
+str(alc2)
+
 
 ```
 
@@ -55,12 +69,6 @@ The purpose of your analysis is to study the relationships between high/low alco
 
 I chose student's sex, the quality of their family relationships, and parents educational background to observe in relation to the use of alcohol. 
 
-alc$high_use (logi) The variable high_use is a logical one: TRUE/FALSE. 
-alc$sex (chr) student's sex (binary: 'F' - female or 'M' - male)
-alc$famrel (int) quality of family relationships (numeric: from 1 - very bad to 5 - excellent)
-alc$Medu (int) mother's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
-alc$Fedu (int)  father's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
-
 My hypotheses are: 
 I. The sex male predicts high alcohol use
 II. The quality of family relationships predicts high alcohol use
@@ -68,10 +76,10 @@ III. Mothers educational level predicts high alcohol use
 IV. Fathers educational level predicts high alcohol use
 
 ```{r}
-gather(alc) %>% glimpse
-gather(alc) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar()
 
-summary(alc$alc_use)
+gather(alc2) %>% glimpse
+gather(alc2) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar()
+
 
 ```
 
@@ -92,28 +100,15 @@ As for the hypotheses I set earlier, according to the means and distributions of
 ```{r}
 
 #Alcohol use & high_use
-ggplot(data = alc, aes(x = alc_use))+ geom_bar()
-ggplot(data = alc, aes(x = high_use))+ geom_bar()
+ggplot(data = alc2, aes(x = alc_use))+ geom_bar()
+ggplot(data = alc2, aes(x = high_use))+ geom_bar()
 
 # The counts of different groups
-alc %>% group_by(high_use) %>% summarise(count = n())
-alc %>% group_by(high_use, sex) %>% summarise(count = n())
+alc2 %>% group_by(high_use) %>% summarise(count = n())
+alc2 %>% group_by(high_use, sex) %>% summarise(count = n())
 
 
-# The aggregate data and the data frames
-alc_agg <- alc %>%
-  group_by(high_use, sex)%>%
-  summarise(alc_use_mean = round(mean(alc_use), digits = 2),
-            alc_use_sd = round(sd(alc_use), digits = 2),
-            famrel_mean = round(mean(famrel), digits = 2),
-            famrel_sd = round(sd(famrel), digits = 2),
-            medu_mean = round(mean(Medu), digits = 2),
-            medu_sd = round(sd(Medu), digits = 2),
-            fedu_mean = round(mean(Fedu), digits = 2),
-            fedu_sd = round(sd(Fedu), digits = 2),
-             n=n())
-alc_agg
-
+# The aggregate data and the data frame
 alc_agg2 <- alc %>%
   group_by(high_use)%>%
   summarise(
@@ -134,13 +129,13 @@ alc_agg2
 
 # The frequencies & and the relative frequencies and the bar plots of high-use/low-use in the group sex 
 
-table(alc$high_use, alc$sex)
+table(alc2$high_use, alc2$sex)
 
-round(prop.table(table(alc$high_use, alc$sex),2)*100)
+round(prop.table(table(alc2$high_use, alc2$sex),2)*100)
 
-alc %>% group_by(high_use, sex) %>% summarise(count = n())%>%ungroup()
+alc2 %>% group_by(high_use, sex) %>% summarise(count = n())%>%ungroup()
 
-ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~sex)
+ggplot(data = alc2, aes(x = high_use))+ geom_bar() + facet_wrap(~sex)
 
 
 ```
@@ -150,14 +145,12 @@ ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~sex)
 ```{r}
 
 # The frequencies & percentages of high-use by the different family relation points
-table(alc$high_use, alc$famrel)
-prop.table(table(alc$high_use, alc$famrel))*100
+table(alc2$high_use, alc2$famrel)
+prop.table(table(alc2$high_use, alc2$famrel))*100
 
 # Plots 
-ggplot(data = alc, aes(x = famrel))+ geom_bar()
-ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~famrel)
-
-ggplot(alc, aes(x = high_use, y = Medu, col = sex)) + geom_boxplot() + ylab("famrel") + ggtitle("Student alcohol consumption by family relations")
+ggplot(data = alc2, aes(x = famrel))+ geom_bar()
+ggplot(data = alc2, aes(x = famrel))+ geom_bar() + facet_wrap(~high_use)
 
 alc_agg %>%
   ggplot(aes(high_use, famrel_mean, group = sex, colour = sex)) + 
@@ -170,14 +163,12 @@ alc_agg %>%
 ```{r}
 
 # The frequencies & percentages of high-use by the different mothers educational background points
-table(alc$high_use, alc$Medu)
-prop.table(table(alc$high_use, alc$Medu))*100
+table(alc2$high_use, alc2$Medu)
+prop.table(table(alc2$high_use, alc2$Medu))*100
 
 # Plots
-ggplot(data = alc, aes(x = Medu))+ geom_bar()
-ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~Medu)
-
-ggplot(alc, aes(x = high_use, y = Medu, col = sex)) + geom_boxplot() + ylab("Fedu") + ggtitle("Student alcohol consumption by mothers educational level")
+ggplot(data = alc2, aes(x = Medu))+ geom_bar()
+ggplot(data = alc2, aes(x = Medu))+ geom_bar() + facet_wrap(~high_use)
 
 alc_agg %>%
   ggplot(aes(high_use, medu_mean, group = sex, colour = sex)) + 
@@ -191,25 +182,37 @@ alc_agg %>%
 ```{r}
 
 # The frequencies & percentages of high-use by the different fathers educational background points
-table(alc$high_use, alc$Fedu)
-prop.table(table(alc$high_use, alc$Fedu))*100
+table(alc2$high_use, alc2$Fedu) #xtabs(~ high_use + Fedu, data=alc) optional way
+prop.table(table(alc2$high_use, alc2$Fedu))*100
 
 #Plots 
-ggplot(data = alc, aes(x = Fedu))+ geom_bar()
-ggplot(data = alc, aes(x = high_use))+ geom_bar() + facet_wrap(~Fedu)
+ggplot(data = alc2, aes(x = Fedu))+ geom_bar()
+ggplot(data = alc2, aes(x = Fedu))+ geom_bar() + facet_wrap(~high_use)
+
 
 alc_agg %>%
   ggplot(aes(high_use, fedu_mean, group = sex, colour = sex)) + 
   geom_line(alpha=.7) + 
   geom_point() + theme_classic()
 
-ggplot(alc, aes(x = high_use, y = Fedu, col = sex)) + geom_boxplot() + ylab("Fedu") + ggtitle("Student alcohol consumption by fathers educational level")
 
 
 ```
 
+## Summary of the data and the chosen variables
 
-## 5
+The frequency of observations in the high-use category is lower than in the low-use (high use n=111, low-use n=259). The sexes are almost equally distributed, (f=195, m=175). 
+
+The distribution of the family relationship points shows that the values 4 and 5 have the most observations, and the family relations are bad in minority of the cases (n (1-2)= 36, n (3-5) = 344). The distribution of parents educational level shows that the educational level of mothers in a bit higher that the fathers. 
+
+The frequency of high usage is higher with the male group (males: high-use n= 70, low-use n=105), than females (females: high-use n= 41, low-use n=154).
+
+The means of the family relations and mothers’ education are higher in the low-usage group. The mean of fathers’ education is slightly higher in the high-use group. The difference is in the high-use female group: the mean of the fathers education is higher in the high-use group, as for the males in high-use group the mean of the fathers education is lower.
+
+As for the hypotheses I set earlier, according to the means and distributions of the frequencies, the male sex seems to be associated with a higher frequency of alcohol use (I), as does the poorer quality of family relationships (II) and mothers lower educational level (III), but the fathers educational level is not associated with the lower alcohol consumption in females (IV).
+
+
+## 5 The model
 
 Use logistic regression to statistically explore the relationship between your chosen variables and the binary high/low alcohol consumption variable as the target variable. 
 
@@ -217,6 +220,9 @@ a) Present and interpret a summary of the fitted model.
 
 
 b) Present and interpret the coefficients of the model as odds ratios and provide confidence intervals for them. 
+
+
+"the exponents of the coefficients of a logistic regression model can be interpret as odds ratios between a unit change (vs no change) in the corresponding explanatory variable."
 
 
 c) Interpret the results and compare them to your previously stated hypothesis. 
@@ -231,8 +237,6 @@ IV. Fathers educational level predicts high alcohol use
 Hint: If your model includes factor variables see for example the first answer of this stackexchange thread on how R treats and how you should interpret these variables in the model output (or use some other resource to study this). (0-5 points)
 
 
-"the exponents of the coefficients of a logistic regression model can be interpret as odds ratios between a unit change (vs no change) in the corresponding explanatory variable."
-
 alc$sex (chr) student's sex (binary: 'F' - female or 'M' - male)
 alc$famrel (int) quality of family relationships (numeric: from 1 - very bad to 5 - excellent)
 alc$Medu (int) mother's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
@@ -241,8 +245,12 @@ alc$Fedu (int)  father's education (numeric: 0 - none, 1 - primary education (4t
 
 ```{r}
 
+
+
+
 m <- glm(high_use ~ sex + famrel + Medu + Fedu, data = alc, family = "binomial")
 summary(m)
+
 
 # compute odds ratios (OR)
 OR <- coef(m) %>% exp
@@ -258,7 +266,12 @@ cbind(OR, CI)
 ```
 
 
-## 6
+## 6 The predictive power of the model
+
+According to the previous logistic regression model the sex (M) and family relations had a statistical relationship with high/low alcohol consumption. 
+
+The model (m2) shows that the AIC (435.26) is almost the same as it was in the previous model (438.88).
+
 
 Using the variables which, according to your logistic regression model, had a statistical relationship with high/low alcohol consumption, explore the predictive power of you model. 
 
@@ -276,20 +289,43 @@ OR2 <- coef(m2) %>% exp
 CI2 <- confint(m2) %>% exp
 cbind(OR2, CI2)
 
-# predict() the probability of high_use
+# Predict() the probability of high_use
 probabilities <- predict(m2, type = "response")
 
-# add the predicted probabilities to 'alc'
+# Add the predicted probabilities to 'alc'
 alc <- mutate(alc, probability = probabilities)
 
-# use the probabilities to make a prediction of high_use
+# The probabilities to make a prediction of high_use
 alc <- mutate(alc, prediction = probability > 0.5)
 
-# see the last ten original classes, predicted probabilities, and class predictions
+# The last ten original classes, predicted probabilities, and class predictions
 select(alc, high_use, sex, famrel, prediction) %>% tail(10)
 
-# tabulate the target variable versus the predictions
+# The target variable versus the predictions
 table(high_use = alc$high_use, prediction = alc$prediction)
+
+# A plot of 'high_use' versus 'probability' in 'alc', define the geom as points and draw the plot
+ggplot(alc, aes(x = probability, y = high_use, col = prediction))+ geom_point()
+
+# tabulate the target variable versus the predictions
+table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table %>% addmargins
+
+# define a loss function (average prediction error)
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+
+# call loss_func to compute the average number of wrong predictions in the (training) data
+loss_func(class = alc$high_use, prob = alc$probability)
+
+
+# K-fold cross-validation
+library(boot)
+cv <- cv.glm(data = alc, cost = loss_func, glmfit = m, K = 10)
+
+# average number of wrong predictions in the cross validation
+cv$delta[1]
 
 
 ```
