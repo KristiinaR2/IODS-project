@@ -127,10 +127,7 @@ prop.table(table(alc2$high_use, alc2$famrel))*100
 ggplot(data = alc2, aes(x = famrel))+ geom_bar()
 ggplot(data = alc2, aes(x = famrel))+ geom_bar() + facet_wrap(~high_use)
 
-alc_agg %>%
-  ggplot(aes(high_use, famrel_mean, group = sex, colour = sex)) + 
-  geom_line(alpha=.7) + 
-  geom_point() + theme_classic()
+
 ```
 
 ### 3. Mothers education
@@ -145,11 +142,6 @@ prop.table(table(alc2$high_use, alc2$Medu))*100
 ggplot(data = alc2, aes(x = Medu))+ geom_bar()
 ggplot(data = alc2, aes(x = Medu))+ geom_bar() + facet_wrap(~high_use)
 
-alc_agg %>%
-  ggplot(aes(high_use, medu_mean, group = sex, colour = sex)) + 
-  geom_line(alpha=.7) + 
-  geom_point() + theme_classic()
-
 ```
 
 ### 4. Fathers education
@@ -163,14 +155,6 @@ prop.table(table(alc2$high_use, alc2$Fedu))*100
 #Plots 
 ggplot(data = alc2, aes(x = Fedu))+ geom_bar()
 ggplot(data = alc2, aes(x = Fedu))+ geom_bar() + facet_wrap(~high_use)
-
-
-alc_agg %>%
-  ggplot(aes(high_use, fedu_mean, group = sex, colour = sex)) + 
-  geom_line(alpha=.7) + 
-  geom_point() + theme_classic()
-
-
 
 ```
 
