@@ -5,15 +5,12 @@ date: "19 11 2021"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r}
 
 library(tidyverse)
 library(dplyr)
 library(GGally)
 library(ggplot2)
-
-setwd("C:/LocalData/krraiha/Opiskelu HY/Jatko-opinnot/IODS-project/Data")
 
 ```
 
@@ -24,12 +21,6 @@ Source: [https://archive.ics.uci.edu/ml/datasets/Student+Performance#]
 In the data frame 'alc' there are	370 observations of 51 variables.
 
 I chose student's sex, the quality of their family relationships, and parents educational background to observe in relation to the use of alcohol. 
-
-alc$high_use (logi) The variable high_use is a logical one: TRUE/FALSE. 
-alc$sex (chr) student's sex (binary: 'F' - female or 'M' - male)
-alc$famrel (int) quality of family relationships (numeric: from 1 - very bad to 5 - excellent)
-alc$Medu (int) mother's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
-alc$Fedu (int)  father's education (numeric: 0 - none, 1 - primary education (4th grade), 2 - 5th to 9th grade, 3 - secondary education or 4 - higher education)
 
 
 ```{r}
@@ -61,7 +52,6 @@ III. Mothers educational level predicts high alcohol use
 IV. Fathers educational level predicts high alcohol use
 
 ```{r}
-
 gather(alc2) %>% glimpse
 gather(alc2) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar()
 
