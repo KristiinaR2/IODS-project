@@ -5,7 +5,7 @@ date: "19 11 2021"
 output: html_document
 ---
 
-# Logistic regression
+
 
 ```{r}
 
@@ -15,6 +15,8 @@ library(GGally)
 library(ggplot2)
 
 ```
+
+# Logistic regression
 
 ## 1. The data
 
