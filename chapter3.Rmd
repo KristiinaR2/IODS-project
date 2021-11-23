@@ -5,6 +5,8 @@ date: "19 11 2021"
 output: html_document
 ---
 
+# Logistic regression
+
 ```{r}
 
 library(tidyverse)
@@ -14,7 +16,7 @@ library(ggplot2)
 
 ```
 
-## 2 The data
+## 1. The data
 
 Source: [https://archive.ics.uci.edu/ml/datasets/Student+Performance#]
 
@@ -41,7 +43,7 @@ str(alc2)
 
 ```
 
-## 3 The hypotheses
+## 2. The hypotheses
 
 I chose student's sex, the quality of their family relationships, and parents educational background to observe in relation to the use of alcohol. 
 
@@ -59,7 +61,7 @@ gather(alc2) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_
 ```
 
 
-## 4 The variables
+## 2. The variables
 
 
 ```{r}
@@ -88,7 +90,7 @@ alc_agg2
 
 ```
 
-### 1. Sex 
+### Sex 
 
 ```{r}
 
@@ -105,7 +107,7 @@ ggplot(data = alc2, aes(x = high_use))+ geom_bar() + facet_wrap(~sex)
 
 ```
 
-### 2. Family relationships 
+### Family relationships 
 
 ```{r}
 
@@ -120,7 +122,7 @@ ggplot(data = alc2, aes(x = famrel))+ geom_bar() + facet_wrap(~high_use)
 
 ```
 
-### 3. Mothers education
+### Mothers education
 
 ```{r}
 
@@ -134,7 +136,7 @@ ggplot(data = alc2, aes(x = Medu))+ geom_bar() + facet_wrap(~high_use)
 
 ```
 
-### 4. Fathers education
+### Fathers education
 
 ```{r}
 
@@ -161,7 +163,7 @@ The means of the family relations and mothers’ education are higher in the low
 As for the hypotheses I set earlier, according to the means and distributions of the frequencies, the male sex seems to be associated with a higher frequency of alcohol use (I), as does the poorer quality of family relationships (II) and mothers lower educational level (III), but the fathers educational level is not associated with the lower alcohol consumption in females (IV).
 
 
-## 5 The model
+## 4. The model
 
 In the first model m = (high_use ~ sex + famrel + Medu + Fedu) only the sex was statistically significant. (Here, the sex male = 1, as the sex female = 0) 
 
@@ -207,7 +209,7 @@ cbind(OR, CI)
 ```
 
 
-## 6 The predictive power of the model
+## The predictive power of the model
 
 The average number of wrong predictions in the cross validation is 0.31. 
 
@@ -263,15 +265,6 @@ ggplot(data=predicted.data, aes(x=sex, y=probability.of.high.a)) +
 ######
 
 ```
-
-## 7
-
-Bonus: Perform 10-fold cross-validation on your model. Does your model have better test set performance (smaller prediction error using 10-fold cross-validation) compared to the model introduced in DataCamp (which had about 0.26 error). Could you find such a model? (0-2 points to compensate any loss of points from the above exercises)
-
-
-## 8
-
-Super-Bonus: Perform cross-validation to compare the performance of different logistic regression models (= different sets of predictors). Start with a very high number of predictors and explore the changes in the training and testing errors as you move to models with less predictors. Draw a graph displaying the trends of both training and testing errors by the number of predictors in the model. (0-4 points to compensate any loss of points from the above exercises)
 
 
 

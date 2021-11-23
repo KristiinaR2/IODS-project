@@ -2,7 +2,7 @@
 output:
   html_document: default
 ---
-# Insert chapter 2 title here
+# Regression and model validation
 
 
 ```{r}
@@ -20,7 +20,6 @@ library(ggplot2)
 
 ```
 
-# Analysing
 
 ## 1 Reading the data
 
@@ -71,7 +70,7 @@ gender_n <- learning2014_3%>%
 
 ```
 
-## 3 Fitting the model
+## 3. Fitting the model
 
 First I printed the correlation matrix again, and decided to choose the following variables to the model:
 
@@ -104,7 +103,7 @@ qplot(Attitude, Points, data = learning2014_3) + geom_smooth(method = "lm")
 
 ```
 
-## 4 Summary of the fitted model
+## 4. Summary of the fitted model
 
 The results of the model "fit2" indicate, that attitude is a statistically significant explanatory variable (F(1,164)=38.61, p<.001) for the students points. The adjusted R-squared is 0.1856, so the attitude predicts 19% of the variation of students points.  
 
@@ -114,8 +113,7 @@ summary(fit2)
 
 ```
 
-## 5 diagnostic plots
-
+## 5. diagnostic plots
 
 The residual plots show that the residuals of the observations are not related to the fitted values, and they occur on both sides of zero (= assumption that the size of error does not depend on explanatory variables). 
 
