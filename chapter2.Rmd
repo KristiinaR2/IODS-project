@@ -2,8 +2,8 @@
 output:
   html_document: default
 ---
-# Regression and model validation
 
+# Chapter 2: Regression and model validation
 
 ```{r}
 date()
@@ -21,7 +21,7 @@ library(ggplot2)
 ```
 
 
-## 1 Reading the data
+## 2.1 Reading the data
 
 The data consists of 166 observations (rows) of 8 variables (columns). The variables are: X (rownumber), Gender (chr: "F", "M"), Age (int), Attitude (int), deep (dbl), stra (dbl), surf (dbl), Points (int). I mutated the variable gender as a factor, and dropped the X column (the row numbers). 
 
@@ -47,7 +47,7 @@ str(learning2014_3)
 
 ```
 
-## 2 Graphical overview of the data
+## 2.2 Graphical overview of the data
 
 First I explored the data with couple of scatter matrix. What I noticed was that the distributions of age (mean 25) are skewed to the right, as most of the subjects are close to 20 years. The rest of variables are quite normally distributed taking into account the sample size. The gender variable has more observation in F(n=110), than in M(n=56), that might affect the distributions. There are no too high correlations between the variables (collinearity) excluding the the variables surf and stra, that seem to measure same thing, as their correlation is 1? 
 
@@ -70,7 +70,7 @@ gender_n <- learning2014_3%>%
 
 ```
 
-## 3. Fitting the model
+## 2.3 Fitting the model
 
 First I printed the correlation matrix again, and decided to choose the following variables to the model:
 
@@ -103,7 +103,7 @@ qplot(Attitude, Points, data = learning2014_3) + geom_smooth(method = "lm")
 
 ```
 
-## 4. Summary of the fitted model
+## 2.4 Summary of the fitted model
 
 The results of the model "fit2" indicate, that attitude is a statistically significant explanatory variable (F(1,164)=38.61, p<.001) for the students points. The adjusted R-squared is 0.1856, so the attitude predicts 19% of the variation of students points.  
 
@@ -113,7 +113,7 @@ summary(fit2)
 
 ```
 
-## 5. diagnostic plots
+## 2.5 diagnostic plots
 
 The residual plots show that the residuals of the observations are not related to the fitted values, and they occur on both sides of zero (= assumption that the size of error does not depend on explanatory variables). 
 

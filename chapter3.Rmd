@@ -16,9 +16,15 @@ library(ggplot2)
 
 ```
 
-# Logistic regression
 
-## 1. The data
+# Chapter 3: Logistic regression
+
+```{r}
+date()
+```
+
+
+## 3.1 The data
 
 Source: [https://archive.ics.uci.edu/ml/datasets/Student+Performance#]
 
@@ -45,7 +51,7 @@ str(alc2)
 
 ```
 
-## 2. The hypotheses
+## 3.2 The hypotheses
 
 I chose student's sex, the quality of their family relationships, and parents educational background to observe in relation to the use of alcohol. 
 
@@ -165,7 +171,7 @@ The means of the family relations and mothers’ education are higher in the low
 As for the hypotheses I set earlier, according to the means and distributions of the frequencies, the male sex seems to be associated with a higher frequency of alcohol use (I), as does the poorer quality of family relationships (II) and mothers lower educational level (III), but the fathers educational level is not associated with the lower alcohol consumption in females (IV).
 
 
-## 4. The model
+## 3.4 The model
 
 In the first model m = (high_use ~ sex + famrel + Medu + Fedu) only the sex was statistically significant. (Here, the sex male = 1, as the sex female = 0) 
 

@@ -13,16 +13,24 @@ library(tidyverse)
 library(ggplot2)
 library(corrplot)
 
+getwd()
+
+```
+# Chapter 4: Clustering and classification
+
+```{r}
+date()
 ```
 
-## Clustering and classification
 
-### 1. The data
+### 1.1 The data
 
 The data *Boston* consists of 506 observations of 14 variables. Details of the variables are shown here: [https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html]. 
 
 "Show a graphical overview of the data and show summaries of the variables in the data. Describe and interpret the outputs, commenting on the distributions of the variables and the relationships between them."
 
+
+https://tuomonieminen.github.io/Helsinki-Open-Data-Science/#/40
 
 
 ```{r}
@@ -47,7 +55,7 @@ corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.c
 
 ```
 
-### 2. 
+### 2. Data standardization
 
 "Standardize the dataset and print out summaries of the scaled data. How did the variables change? Create a categorical variable of the crime rate in the Boston dataset (from the scaled crime rate). Use the quantiles as the break points in the categorical variable. Drop the old crime rate variable from the dataset. Divide the dataset to train and test sets, so that 80% of the data belongs to the train set."
 
@@ -55,5 +63,35 @@ corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.c
 
 ```{r}
 
+
+
 ```
+
+### 3.LDA
+
+"Fit the linear discriminant analysis on the train set. Use the categorical crime rate as the target variable and all the other variables in the dataset as predictor variables. Draw the LDA (bi)plot. "
+
+```{r}
+
+```
+
+
+"Save the crime categories from the test set and then remove the categorical crime variable from the test dataset."
+
+"Then predict the classes with the LDA model on the test data. Cross tabulate the results with the crime categories from the test set. Comment on the results." 
+
+```{r}
+
+```
+
+### 4. K-means
+
+Reload the Boston dataset and standardize the dataset (we did not do this in the Datacamp exercises, but you should scale the variables to get comparable distances). Calculate the distances between the observations. Run k-means algorithm on the dataset. Investigate what is the optimal number of clusters and run the algorithm again. Visualize the clusters (for example with the pairs() or ggpairs() functions, where the clusters are separated with colors) and interpret the results.
+
+```{r}
+
+
+```
+
+
 
