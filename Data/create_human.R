@@ -34,7 +34,7 @@ dim(gii)
 summary(gii)
 
 
-#Look at the meta files and rename the variables with (shorter) descriptive names. (1 point)
+#Look at the meta files and rename the variables with (shorter) descriptive names.
 
 colnames(gii)
 
@@ -53,7 +53,7 @@ str(gii1)
 colnames(hd)
 
 hd1 <- rename(hd,
-          HDI.Rank=HDI.Rank,
+        HDI.Rank=HDI.Rank,
          Country= Country,
          HDI= Human.Development.Index..HDI.,
          LExp=Life.Expectancy.at.Birth,
@@ -64,60 +64,35 @@ hd1 <- rename(hd,
 
 str(hd1)
 
+#Mutated the “Gender inequality” data and created two new variables: 
+#FM_ratio_2nd_ed and FM_ratio_labor.
 
-#Mutate the “Gender inequality” data and create two new variables.
-#The first one should be the ratio of Female and Male populations with 
-#secondary education in each country. (i.e. edu2F / edu2M). 
-#The second new variable should be the ratio of labour force participation of 
-#females and males in each country (i.e. labF / labM). (1 point)
-
-gii1 <- gii%>%
-  mutate(GII.Rank=GII.Rank,
-         Country= Country,
-         GII_index= Gender.Inequality.Index..GII.,
-         MMR= Maternal.Mortality.Ratio,
-         ABR=Adolescent.Birth.Rate,
-         Rep_per= Percent.Representation.in.Parliament,
-         Fem_2nd_ed= Population.with.Secondary.Education..Female.,
-         Male_2nd_ed= Population.with.Secondary.Education..Male.,
-         Fem_labour= Labour.Force.Participation.Rate..Female.,
-         Male_labour= Labour.Force.Participation.Rate..Male.)
-
-str(gii1)
+#The first one is the ratio of Female and Male populations with 
+#secondary education in each country and the second 
+#the ratio of labour force participation of females and males in each country. 
 
 gii2 <- gii1%>%
-  mutate()
+  mutate(FM_ratio_2nd_ed= Fem_2nd_ed/Male_2nd_ed,
+         FM_ratio_labor= Fem_labour/Male_labour)
 
+str(gii2)
 
-#Join together the two datasets using the variable Country as the identifier. 
-#Keep only the countries in both data sets (Hint: inner join). 
-#The joined data should have 195 observations and 19 variables. 
-#Call the new joined data "human" and save it in your data folder. (1 point)
+# Joining the data and saving it as a .csv to the IODS-data file
 
+library(data.table)
+dt1 <- data.table(hd1, key = "Country") 
+dt2 <- data.table(gii2, key = "Country")
 
-# Join the data sets
+human <- dt1[dt2]
 
-# First: define columns that vary in data sets
-vary_cols <- c("failures","paid","absences","G1","G2","G3")
+# the joined data 'hd_gii_joined' has 195 observations and 19 columns
+str(human)
+dim(human)
+colnames(human)
 
-# Second: pick the columns which are used as identifiers of respondents
-join_cols <- setdiff(colnames(math_data), vary_cols)
+setwd("C:/LocalData/krraiha/Opiskelu HY/Jatko-opinnot/IODS-project/data")
+write.csv(human, "human.csv")
 
-# Third: merge the two data sets with inner_join verb and add suffixes
-math_por <- inner_join(math_data, por_data, by = join_cols, suffix = c(".math", ".por"))
-
-# the joined data 'math_por' has:
-## 370 rows and 39 columns; i.e. 370 observations (students) of 39 variables
-## the varying 6 variables have suffixes .por and .math identifying from which data set their are
-dim(math_por)
-str(math_por)
-colnames(math_por)
-
-
-# create a new data frame with only the joined variables
-human <- select(math_por, one_of(join_cols))
-
-write.csv("human.csv")
 
 
 
