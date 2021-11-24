@@ -18,8 +18,6 @@ library(tidyverse)
 hd <- read.csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human_development.csv", stringsAsFactors = F)
 gii <- read.csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/gender_inequality.csv", stringsAsFactors = F, na.strings = "..")
 
-# Explore the datasets: see the structure and dimensions of the data.
-#Create summaries of the variables. (1 point)
 
 # The data frame hd (Human development) consists of 195 observations of 8 variables
 # 195 rows/ 8 columns. 
@@ -34,7 +32,7 @@ dim(gii)
 summary(gii)
 
 
-#Look at the meta files and rename the variables with (shorter) descriptive names.
+#Renaming the variables with (shorter) descriptive names.
 
 colnames(gii)
 
@@ -66,7 +64,6 @@ str(hd1)
 
 #Mutated the “Gender inequality” data and created two new variables: 
 #FM_ratio_2nd_ed and FM_ratio_labor.
-
 #The first one is the ratio of Female and Male populations with 
 #secondary education in each country and the second 
 #the ratio of labour force participation of females and males in each country. 
