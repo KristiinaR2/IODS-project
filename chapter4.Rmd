@@ -1,0 +1,59 @@
+---
+title: "chapter_4"
+author: "Kristiina"
+date: "23 11 2021"
+output: html_document
+---
+
+```{r}
+# access the MASS package
+library(MASS)
+
+library(tidyverse)
+library(ggplot2)
+library(corrplot)
+
+```
+
+## Clustering and classification
+
+### 1. The data
+
+The data *Boston* consists of 506 observations of 14 variables. Details of the variables are shown here: [https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html]. 
+
+"Show a graphical overview of the data and show summaries of the variables in the data. Describe and interpret the outputs, commenting on the distributions of the variables and the relationships between them."
+
+
+
+```{r}
+
+# load the data
+data("Boston")
+
+str(Boston)
+summary(Boston)
+
+# plot matrix of the variables
+pairs(Boston)
+
+# rounded correlation matrix
+cor_matrix<-cor(Boston) %>% round(digits = 2)
+
+# print the correlation matrix
+cor_matrix
+
+# visualisation of the correlation matrix
+corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.cex = 0.6)
+
+```
+
+### 2. 
+
+"Standardize the dataset and print out summaries of the scaled data. How did the variables change? Create a categorical variable of the crime rate in the Boston dataset (from the scaled crime rate). Use the quantiles as the break points in the categorical variable. Drop the old crime rate variable from the dataset. Divide the dataset to train and test sets, so that 80% of the data belongs to the train set."
+
+
+
+```{r}
+
+```
+
