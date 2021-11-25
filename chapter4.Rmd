@@ -27,6 +27,7 @@ date()
 
 The data *Boston* consists of 506 observations of 14 variables. Details of the variables are shown here: [https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html]. 
 
+
 "Show a graphical overview of the data and show summaries of the variables in the data. Describe and interpret the outputs, commenting on the distributions of the variables and the relationships between them."
 
 
@@ -42,7 +43,7 @@ str(Boston)
 summary(Boston)
 
 # plot matrix of the variables
-pairs(Boston)
+pairs(Boston[,c(2:14)], pch = 20, cex=0.4, upper.panel=NULL)
 
 # rounded correlation matrix
 cor_matrix<-cor(Boston) %>% round(digits = 2)
@@ -53,25 +54,99 @@ cor_matrix
 # visualisation of the correlation matrix
 corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.cex = 0.6)
 
+
 ```
 
 ### 2. Data standardization
 
-"Standardize the dataset and print out summaries of the scaled data. How did the variables change? Create a categorical variable of the crime rate in the Boston dataset (from the scaled crime rate). Use the quantiles as the break points in the categorical variable. Drop the old crime rate variable from the dataset. Divide the dataset to train and test sets, so that 80% of the data belongs to the train set."
+"Standardize the dataset and print out summaries of the scaled data. 
 
+How did the variables change?"
 
+Here is the dataset standardized with the summaries. The function ´scale´ is generic function whose default method centers and/or scales the columns of a numeric matrix. In the scaling the column means are subtracted from the corresponding columns and the the difference is divided with standard deviation. The scaling makes the means of the variables in dataset boston 0. 
 
 ```{r}
 
+
+# center and standardize variables
+boston_scaled <- scale(Boston)
+
+# summaries of the scaled variables
+summary(boston_scaled)
+
+# class of the boston_scaled object
+class(boston_scaled)
+
+# change the object to data frame
+boston_scaled <- as.data.frame(boston_scaled)
+
+
+```
+### Creating the testdata
+
+Create a categorical variable of the crime rate in the Boston dataset (from the scaled crime rate). Use the quantiles as the break points in the categorical variable. Drop the old crime rate variable from the dataset. 
+
+Divide the dataset to train and test sets, so that 80% of the data belongs to the train set."
+
+Here a categorical variable of the crime rate is created, with quantiles and the old crime rate variable dropped. The dataset is then divided to train (80% of the data) and test sets. 
+
+```{r}
+
+# summary of the scaled crime rate
+summary(boston_scaled$crim)
+
+# create a quantile vector of crim and print it
+bins <- quantile(boston_scaled$crim)
+bins
+
+# create a categorical variable 'crime'
+crime <- cut(boston_scaled$crim, breaks = bins, include.lowest = TRUE, labels = c("low", "med_low", "med_high", "high"))
+
+# look at the table of the new factor crime
+table(crime)
+
+# remove original crim from the dataset
+boston_scaled <- dplyr::select(boston_scaled, -crim)
+
+# add the new categorical value to scaled data
+boston_scaled <- data.frame(boston_scaled, crime)
+
+# number of rows in the Boston dataset 
+n <- nrow(boston_scaled)
+
+# choose randomly 80% of the rows
+ind <- sample(n,  size = n * 0.8)
+
+# create train set
+train <- boston_scaled[ind,]
+
+# create test set 
+test <- boston_scaled[-ind,]
+
+# save the correct classes from test data
+correct_classes <- test$crime
+
+# remove the crime variable from test data
+test <- dplyr::select(test, -crime)
 
 
 ```
 
+
+
 ### 3.LDA
 
-"Fit the linear discriminant analysis on the train set. Use the categorical crime rate as the target variable and all the other variables in the dataset as predictor variables. Draw the LDA (bi)plot. "
+"Fit the linear discriminant analysis on the train set. 
+
+Use the categorical crime rate as the target variable and all the other variables in the dataset as predictor variables. 
+
+Draw the LDA (bi)plot. "
+
+
 
 ```{r}
+
+
 
 ```
 
@@ -81,6 +156,7 @@ corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.c
 "Then predict the classes with the LDA model on the test data. Cross tabulate the results with the crime categories from the test set. Comment on the results." 
 
 ```{r}
+
 
 ```
 
