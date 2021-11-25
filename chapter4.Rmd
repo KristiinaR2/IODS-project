@@ -60,22 +60,17 @@ corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.c
 
 How did the variables change?"
 
-Here is the dataset standardized with the summaries. The function ´scale´ is generic function whose default method centers and/or scales the columns of a numeric matrix. In the scaling the column means are subtracted from the corresponding columns and the the difference is divided with standard deviation. The scaling makes the means of the variables in dataset boston 0. 
+Linear discriminant analysis produces results based on the assumptions that
+variables are normally distributed, the normal distributions for each class share the same covariance matrix, and the variables are continuous.Because of the assumptions, the data might need scaling before fitting the model.
+
+Below is the dataset standardized with the summaries. The function ´scale´ is generic function whose default method centers and/or scales the columns of a numeric matrix. In the scaling the column means are subtracted from the corresponding columns and the the difference is divided with standard deviation. The scaling makes the means of the variables in dataset boston 0. 
 
 ```{r}
 
-
-# center and standardize variables
-boston_scaled <- scale(Boston)
-
-# summaries of the scaled variables
-summary(boston_scaled)
-
-# class of the boston_scaled object
-class(boston_scaled)
-
-# change the object to data frame
-boston_scaled <- as.data.frame(boston_scaled)
+boston_scaled <- scale(Boston) # center and standardize variables
+summary(boston_scaled)# summaries of the scaled variables
+class(boston_scaled)# class of the boston_scaled object
+boston_scaled <- as.data.frame(boston_scaled) # change the object to data frame
 
 
 ```
@@ -89,42 +84,19 @@ Here a categorical variable of the crime rate is created, with quantiles and the
 
 ```{r}
 
-# summary of the scaled crime rate
-summary(boston_scaled$crim)
-
-# create a quantile vector of crim and print it
-bins <- quantile(boston_scaled$crim)
+summary(boston_scaled$crim) #summary of the scaled crime rate
+bins <- quantile(boston_scaled$crim) #a quantile vector crim
 bins
+crime <- cut(boston_scaled$crim, breaks = bins, include.lowest = TRUE, labels = c("low", "med_low", "med_high", "high")) # a categorical variable 'crime'
+table(crime) # table of the new factor crime
 
-# create a categorical variable 'crime'
-crime <- cut(boston_scaled$crim, breaks = bins, include.lowest = TRUE, labels = c("low", "med_low", "med_high", "high"))
+boston_scaled <- dplyr::select(boston_scaled, -crim)# original crim removed from the dataset
+boston_scaled <- data.frame(boston_scaled, crime)# adding the new categorical value to scaled data
 
-# look at the table of the new factor crime
-table(crime)
-
-# remove original crim from the dataset
-boston_scaled <- dplyr::select(boston_scaled, -crim)
-
-# add the new categorical value to scaled data
-boston_scaled <- data.frame(boston_scaled, crime)
-
-# number of rows in the Boston dataset 
-n <- nrow(boston_scaled)
-
-# choose randomly 80% of the rows
-ind <- sample(n,  size = n * 0.8)
-
-# create train set
-train <- boston_scaled[ind,]
-
-# create test set 
-test <- boston_scaled[-ind,]
-
-# save the correct classes from test data
-correct_classes <- test$crime
-
-# remove the crime variable from test data
-test <- dplyr::select(test, -crime)
+n <- nrow(boston_scaled) # number of rows in the Boston dataset 
+ind <- sample(n,  size = n * 0.8) # choosing a random 80% of the rows
+train <- boston_scaled[ind,] # the train set
+test <- boston_scaled[-ind,] # the test set
 
 
 ```
@@ -133,25 +105,18 @@ test <- dplyr::select(test, -crime)
 
 ### 3.LDA
 
-"Fit the linear discriminant analysis on the train set. 
-
-Use the categorical crime rate as the target variable and all the other variables in the dataset as predictor variables. 
-
-Draw the LDA (bi)plot. "
-
-
 https://tuomonieminen.github.io/Helsinki-Open-Data-Science/#/40 
+
+Here a linear discriminant analysis (LDA) is fitted using the categorical crime rate as the target variable and all the other variables as predictors.
+
+Based on the trained model LDA calculates the probabilities for the new observation for belonging in each of the classes. The observation is classified to the class of the highest probability
 
 ```{r}
 
-
-# linear discriminant analysis
-lda.fit <- lda(crime ~ ., data = train)
-
-# print the lda.fit object
+lda.fit <- lda(crime ~ ., data = train) # the LDA model
 lda.fit
 
-# the function for lda biplot arrows
+# LDA biplot arrows
 lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "orange", tex = 0.75, choices = c(1,2)){
   heads <- coef(x)
   arrows(x0 = 0, y0 = 0, 
@@ -161,38 +126,37 @@ lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "orange", tex 
        cex = tex, col=color, pos=3)
 }
 
-# target classes as numeric
-classes <- as.numeric(train$crime)
+classes <- as.numeric(train$crime) # target classes as numeric
 
-# plot the lda results
+# plot of the LDA results
 plot(lda.fit, dimen = 2, col = classes, pch = classes)
 lda.arrows(lda.fit, myscale = 1)
 
+
 ```
 
-
+### Predicting the classes
 
 "Save the crime categories from the test set and then remove the categorical crime variable from the test dataset."
 
 "Then predict the classes with the LDA model on the test data. Cross tabulate the results with the crime categories from the test set. Comment on the results." 
 
+The LDA seemed to predict the crime categories quite well, as the predictions were 74% accurate. The class with best prediction is the class ´high´, the poorest class prediction was in the class med_high.
+
+
 ```{r}
 
-# save the correct classes from test data
-#correct_classes <- test$crime
+correct_classes <- test$crime # saving the correct classes from test data
 
-# remove the crime variable from test data
-#test <- dplyr::select(test, -crime)
+test <- dplyr::select(test, -crime) # removing the crime variable from test data
 
-#####
+lda.pred <- predict(lda.fit, newdata = test)# predicting the classes with test data
 
-# predict classes with test data
-lda.pred <- predict(lda.fit, newdata = test)
+result <- table(correct = correct_classes, predicted = lda.pred$class) #cross tab of the results
+result
 
-# cross tabulate the results
-table(correct = correct_classes, predicted = lda.pred$class)
-
-
+diag(prop.table(result, 1)) #probability table
+sum(diag(prop.table(result))) # ennustetarkkuus
 
 ```
 
@@ -204,14 +168,11 @@ Reload the Boston dataset and standardize the dataset (we did not do this in the
 
 data("Boston")
 
-# center and standardize variables
-boston_scaled <- scale(Boston)
+boston_scaled <- scale(Boston) # center and standardize variables
 
-# summaries of the scaled variables
-summary(boston_scaled)
+summary(boston_scaled) # summaries of the scaled variables
 
-# class of the boston_scaled object
-class(boston_scaled)
+class(boston_scaled) # class of the boston_scaled object
 
 # change the object to data frame
 boston_scaled <- as.data.frame(boston_scaled)
