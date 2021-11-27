@@ -16,7 +16,6 @@ library(ggplot2)
 
 ```
 
-
 # Chapter 3: Logistic regression
 
 ```{r}

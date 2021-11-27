@@ -137,10 +137,6 @@ lda.arrows(lda.fit, myscale = 1)
 
 ### Predicting the classes
 
-"Save the crime categories from the test set and then remove the categorical crime variable from the test dataset."
-
-"Then predict the classes with the LDA model on the test data. Cross tabulate the results with the crime categories from the test set. Comment on the results." 
-
 The LDA seemed to predict the crime categories quite well, as the predictions were 74% accurate. The class with best prediction is the class ´high´, the poorest class prediction was in the class med_high.
 
 
@@ -162,22 +158,80 @@ sum(diag(prop.table(result))) # ennustetarkkuus
 
 ### 4. K-means
 
-Reload the Boston dataset and standardize the dataset (we did not do this in the Datacamp exercises, but you should scale the variables to get comparable distances). Calculate the distances between the observations. Run k-means algorithm on the dataset. Investigate what is the optimal number of clusters and run the algorithm again. Visualize the clusters (for example with the pairs() or ggpairs() functions, where the clusters are separated with colors) and interpret the results.
+K-means is an unsupervised method, that assigns observations to groups or clusters based on similarity of the objects. K-means needs the number of clusters as an argument.
+
+In this exercise the the Boston dataset is first reloaded, and standardized. 
+
+The distances between the observations are calculated: the observation belongs to the category whose center is closest to it.
+
+The optimal number of clusters is investigated. One way to determine the number of clusters is to look at how the total of within cluster sum of squares (WCSS) behaves when the number of cluster changes. When plotting the number of clusters and the total WCSS, the optimal number of clusters is when the total WCSS drops radically.
+
+if I interpreted the graphs correctly, there are no clear clusters and the optimal number is 2.
 
 ```{r}
 
 data("Boston")
 
 boston_scaled <- scale(Boston) # center and standardize variables
-
-summary(boston_scaled) # summaries of the scaled variables
-
 class(boston_scaled) # class of the boston_scaled object
+boston_scaled <- as.data.frame(boston_scaled)# changes the object to data frame
 
-# change the object to data frame
-boston_scaled <- as.data.frame(boston_scaled)
+dist_eu <- dist(boston_scaled) # euclidean distance matrix
+summary(dist_eu) # summary of the distances
+
+dist_man <- dist(boston_scaled, method = 'manhattan') # manhattan distance matrix
+summary(dist_man)# summary of the distances
+
+set.seed(123) # K-means might produce different results every time, because it randomly assigns the initial cluster centers. The function set.seed deals with that.
+
+##### here with 3 centers
+
+km <-kmeans(boston_scaled, centers = 3) # k-means clustering
+
+pairs(boston_scaled, col = km$cluster) # plot of the Boston dataset with clusters
+
+library(cluster)
+clusplot(boston_scaled, km$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+
+####### here with 2 centers
+
+km2 <-kmeans(boston_scaled, centers = 2) # k-means clustering
+
+pairs(boston_scaled, col = km2$cluster) # plot of the Boston dataset with clusters
+
+library(cluster)
+clusplot(boston_scaled, km2$cluster, color=TRUE, shade=TRUE, labels=2, lines=0)
+
+
+####
+
+k_max8 <- 8 #  the number of clusters 8
+
+twcss8 <- sapply(1:k_max8, function(k){kmeans(boston_scaled, k)$tot.withinss}) # the total within sum of squares
+twcss8
+
+qplot(x = 1:k_max8, y = twcss8, geom = 'line') # visualizing the results
+
+km <-kmeans(boston_scaled, centers = 2) # k-means clustering
+
+pairs(boston_scaled, col = km$cluster) # plot of the Boston dataset with clusters
+
+####
+
+k_max3 <- 3 #  the number of clusters 3
+
+twcss2 <- sapply(1:k_max3, function(k){kmeans(boston_scaled, k)$tot.withinss}) # the total within sum of squares
+twcss2
+
+qplot(x = 1:k_max3, y = twcss2, geom = 'line') # visualizing the results
+
+km <-kmeans(boston_scaled, centers = 2) # k-means clustering
+
+pairs(boston_scaled, col = km$cluster) # plot of the Boston dataset with clusters
+
 
 ```
+
 
 
 
