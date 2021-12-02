@@ -1,0 +1,26 @@
+---
+title: "week5"
+output: html_document
+---
+
+# 
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(corrplot)
+getwd()
+
+```
+# Chapter 5: Dimensionality reduction techniques
+
+```{r}
+date()
+```
+
+## 5.1 The data
+
+```{r}
+
+```
+

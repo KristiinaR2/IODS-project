@@ -68,7 +68,7 @@ gather(alc2) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_
 ```
 
 
-## 2. The variables
+## 3.3 The variables
 
 
 ```{r}

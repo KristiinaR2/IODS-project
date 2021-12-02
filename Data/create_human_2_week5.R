@@ -72,7 +72,10 @@ data.frame(human[-1], comp = complete.cases(human)) # printing out the data, com
 
 human_ <- filter(human, complete.cases(human)) # filter out all rows with NA values
 
-# 4. Removing the observations which relate to regions instead of countries.
+# 4. Removing the observations which relate to regions instead of countries:
+#Observations 156-162 =
+#"Arab States", "East Asia and the Pacific", "Europe and Central Asia",
+#"Latin America and the Caribbean", "South Asia","Sub-Saharan Africa","World"
 
 human_1 <- human_[-c(156:162), ]
 

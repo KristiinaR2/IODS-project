@@ -23,13 +23,9 @@ date()
 ```
 
 
-### 1.1 The data
+## 4.1 The data
 
 The data *Boston* consists of 506 observations of 14 variables. Details of the variables are shown here: [https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html]. 
-
-
-"Show a graphical overview of the data and show summaries of the variables in the data. Describe and interpret the outputs, commenting on the distributions of the variables and the relationships between them."
-
 
 ```{r}
 
@@ -54,11 +50,7 @@ corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.c
 
 ```
 
-### 2. Data standardization
-
-"Standardize the dataset and print out summaries of the scaled data. 
-
-How did the variables change?"
+## 4.2 Data standardization
 
 Linear discriminant analysis produces results based on the assumptions that
 variables are normally distributed, the normal distributions for each class share the same covariance matrix, and the variables are continuous.Because of the assumptions, the data might need scaling before fitting the model.
@@ -74,11 +66,7 @@ boston_scaled <- as.data.frame(boston_scaled) # change the object to data frame
 
 
 ```
-### Creating the testdata
-
-Create a categorical variable of the crime rate in the Boston dataset (from the scaled crime rate). Use the quantiles as the break points in the categorical variable. Drop the old crime rate variable from the dataset. 
-
-Divide the dataset to train and test sets, so that 80% of the data belongs to the train set."
+## 4.3 Creating the testdata
 
 Here a categorical variable of the crime rate is created, with quantiles and the old crime rate variable dropped. The dataset is then divided to train (80% of the data) and test sets. 
 
@@ -103,7 +91,7 @@ test <- boston_scaled[-ind,] # the test set
 
 
 
-### 3.LDA
+## 4.4 LDA
 
 https://tuomonieminen.github.io/Helsinki-Open-Data-Science/#/40 
 
@@ -156,7 +144,7 @@ sum(diag(prop.table(result))) # ennustetarkkuus
 
 ```
 
-### 4. K-means
+## 4.5 K-means
 
 K-means is an unsupervised method, that assigns observations to groups or clusters based on similarity of the objects. K-means needs the number of clusters as an argument.
 
@@ -231,7 +219,5 @@ pairs(boston_scaled, col = km$cluster) # plot of the Boston dataset with cluster
 
 
 ```
-
-
 
 
