@@ -3,13 +3,14 @@ title: "week5"
 output: html_document
 ---
 
-# 
 
 ```{r}
 library(tidyverse)
 library(ggplot2)
+library(GGally)
 library(corrplot)
-getwd()
+library(factoextra)
+#getwd()
 
 ```
 # Chapter 5: Dimensionality reduction techniques
@@ -20,7 +21,157 @@ date()
 
 ## 5.1 The data
 
+The data 'human' consists of 155 observations of 8 variables:
+
+Edu2.FM = (Edu2.F / Edu2.M) = Proportion of females with at least secondary education divided by the proportion of males with at least secondary education
+Labo.FM = (Labo2.F / Labo2.M) = Proportion of females in the labour force divided by the the proportion of males in the labour force
+Edu.Exp = Expected years of schooling 
+Life.Exp = Life expectancy at birth
+GNI = Gross National Income per capita
+Mat.Mor = Maternal mortality ratio
+Ado.Birth = Adolescent birth rate
+Parli.F = Percetange of female representatives in parliament
+
+On visual inspection, it can be concluded that only the expected years of schooling (Edu.Exp) variable seems to be normally distributed. The highest correlations are to be found between  = life expectancy at birth (Life.Exp) + Maternal mortality ratio (Mat.Mor) (-0.857), and expected years of schooling (Edu.Exp)(0.789). 
+
 ```{r}
+human <- read.table("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human2.txt", sep = "," , header=TRUE)
+
+str(human)
+names(human)
+summary(human)
+
+ggpairs(human) # Visualization of the 'human' variables
+cor(human)
+cor(human) %>% corrplot # The correlation matrix and visualize it with corrplot
 
 ```
+
+## 5.2 Principal component analysis (PCA) 
+
+There are two functions in the default package distribution of R that can be used to perform PCA: princomp() and prcomp(). The prcomp() function uses the SVD (Singular Value Decomposition) and is the preferred, more numerically accurate method.
+
+First the PCA is performed using prcomp() function without standardization of the variables. The results show, that only one component is recognized, as the analysis method makes does not take into account deviating scales.
+
+```{r}
+
+pca_human <- prcomp(human) # principal component analysis (with the SVD method)
+pca_human
+
+# Biplot of the principal component representation and the original variables
+biplot(pca_human, choices = 1:2, cex = c(0.8, 1), col = c("grey40", "deeppink2"))
+
+# Extra plot from a package "factoextra"
+fviz_screeplot(pca_human, addlabels = TRUE, ylim= c(0,100), 
+               barfill="white", barcolor ="darkblue",
+               linecolor="red")
+
+```
+
+Next the variables of the data are standardized, and the PCA repeated. After standardization, the analysis methods deals with the variables as "equal", and more dimensions are to be found.
+
+Looking at the biplot there seems to be 3 parallel (correlating) dimensions.
+
+```{r}
+
+# standardize the variables
+human_std <- scale(human)
+
+# print out summaries of the standardized variables
+summary(human_std)
+
+# perform principal component analysis (with the SVD method)
+pca_human2 <- prcomp(human_std)
+
+# create and print out a summary of pca_human
+s <- summary(pca_human2)
+s
+
+# rounded percentages of variance captured by each PC
+pca2_pr <- round(100*s$importance[2,], digits = 1) 
+
+# print out the percentages of variance
+pca2_pr
+
+# create object pc_lab to be used as axis labels
+pc_lab2 <- paste0(names(pca2_pr), " (", pca2_pr, "%)")
+
+# draw a biplot
+biplot(pca_human2, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab2[1], ylab = pc_lab2[2])
+
+
+# extra plot
+fviz_screeplot(pca_human2, addlabels = TRUE, ylim= c(0,100), 
+               barfill="white", barcolor ="grey40",
+               linecolor="deeppink2")
+
+dimensions_sum <- sum(53.6, 16.2, 9.6)
+dimensions_sum
+
+```
+### Interpretations of the PCA 1 and 2
+
+As the first analysis shows, if the scales of the variables differ, the standardization of the variables is necessary for the method to work. 
+
+In the standardized data the first component explains 53,6% of the features of the data. When added the second (16,2%) and the third (9,6%), the tree first components explain 79,4% of the datas features. 
+
+## 5.2 Multiple Correspondence Analysis (MCA)
+
+The Multiple correspondence analysis (MCA) is an method for summarizing and visualizing a data table containing more than two categorical variables. It analyses the pattern of relationships of several categorical variables, but continuous variables can also be used as background (supplementary) variables.
+
+Here the Multiple Correspondence Analysis (MCA) is performed using the "tea" data, form the Factominer -package.
+
+The data contains 300 observations of 36 variables, so the ggpairs function is not an informative way to visualization of the data.
+
+The analysis is performed with variables: "Tea", "How", "how", "sugar", "where", "lunch", that form a new data set "tea_time".
+
+The visualization of the data shows that there are categories, with only a couple of observations: In the variable "How" the category other has only a couple of observations. This may distort the analysis, so I removed the variable.
+
+### The data
+
+```{r}
+# install.packages("FactoMineR")
+library(FactoMineR)
+data(tea)
+
+str(tea) # 300 obs. of  36 variables
+
+keep_columns <- c("Tea", "how", "sugar", "where", "lunch")
+tea_time <- dplyr::select(tea, one_of(keep_columns))
+
+#"How"
+
+summary(tea_time)
+str(tea_time)
+
+# This produces an error, so I left it out 
+#gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar() + #theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8)) # visualize the dataset
+
+```
+
+### Performing MCA
+
+The dimension 1-3 (Dim.1, Dim.2, Dim.3) explain 53,98% of the variance.  
+The Dim.1 has the biggest eta2-values with variables "how" (0.710) and "where" (0.671). The Dim2 with "where"(0.673) and "how" (0.640), and the Dim.3 with "Sugar" (0.470) and Tea" (0.450).
+
+The last plot shows that dimensions of the data with these variables are condensed rather poorly.
+
+Different plotting options for example here: [http://www.sthda.com/english/articles/31-principal-component-methods-in-r-practical-guide/114-mca-multiple-correspondence-analysis-in-r-essentials/]
+
+```{r}
+
+mca <- MCA(tea_time, graph = FALSE) # multiple correspondence analysis
+
+# summary of the model
+summary(mca)
+
+# MCA factor map
+plot(mca, invisible=c("ind"), habillage = "quali", graph.type = "classic")
+
+# alternative plot with percentages of explained variances
+library("factoextra")
+fviz_screeplot(mca, addlabels = TRUE, ylim = c(0, 45))
+
+```
+
 
