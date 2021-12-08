@@ -57,10 +57,6 @@ RATSL <- RATSL %>% mutate(Time = as.integer(substr(WD,3,4)))
 
 # 4. Compairing the long and the wide data
 
-#A look at the new data sets and compare them with their 
-# wide form versions: Check the variable names, view the data contents and structures, 
-#and create some brief summaries of the variables. 
-
 # The difference between long and wide form data is that in the wide format, 
 # the (repeated) responses will be in a single row, and each response is in a 
 # separate column. In the long format, each row is one time point per observation, 
