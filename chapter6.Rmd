@@ -21,7 +21,7 @@ The Analysis exercise focuses on exploring your data and performing and interpre
 Note: As you read the data sets in your chapter6.Rmd you may have to factor the categorical variables again, as R may not recognise them automatically as factors.
 
 
-## 6.1 
+## 6.1 RATS
 
 "Implement the analyses of Chapter 8 of MABS using the RATS data. (0-7 points: 0-4 points for graphs or analysis results + 0-3 points for their interpretations)"
 
@@ -144,7 +144,7 @@ ggplot(RATSS, aes(x = Group, y = mean)) +
 ```
 ### The analysis
 
-The results of the ANOVA indicate, that the differences between the groups were statistically significant. 
+The results of the ANOVA indicate, that the differences between the groups were statistically significant. (I couldn't figure out how to add the baseline variable to the RATSL8S?).
 
 ```{r}
 
@@ -182,9 +182,11 @@ anova(fit)
 ```
 
 
-## 6.2
+## 6.2 BPRS
 
 "Implement the analyses of Chapter 9 of MABS using the BPRS data. (0-8 points: 0-4 points for graphs or analysis results + 0-4 points for their interpretations)"
+
+"The data consists of 40 male subjects, that were randomly assigned to one of two treatment groups and each subject was rated on the brief psychiatric rating scale (BPRS) measured before treatment began (week 0) and then at weekly intervals for eight weeks. The BPRS assesses the level of 18 symptom constructs such as hostility, suspiciousness, hallucinations and grandiosity; each of these is rated from one (not present) to seven (extremely severe). The scale is used to evaluate patients suspected of having schizophrenia." (MABS, p. 157)
 
 ### The data
 
@@ -227,7 +229,7 @@ ggplot(BPRSL, aes(x = week, y = bprs, linetype = subject)) +
 ```
 
 
-## 6.3
+## 6.3 Linear Mixed Effects Models 
 
 
 
