@@ -63,24 +63,25 @@ glimpse(RATSL)
 # The dimensions of the data
 dim(RATSL)
 
-# Plot of the the RATSL data
+# Plot of the the non-standardized RATSL data
 ggplot(RATSL, aes(x = Time, y = Weight, group = ID)) +
   geom_line(aes(linetype = Group)) +
   scale_x_continuous(name = "Time (days)", breaks = seq(0, 60, 10)) +
   scale_y_continuous(name = "Weight (grams)") +
   theme(legend.position = "top")
 
-# Standardising the variable RATSL
 colnames(RATSL)
 View(RATSL)
 
+# Standardising the variable RATSL
 RATSL <- RATSL %>%
-  group_by(ID) %>%
+  group_by(Time) %>%
   mutate(std_weight = (Weight - mean(Weight))/sd(Weight)) %>%
   ungroup()
 
 # Glimpse the data
 glimpse(RATSL)
+View(RATSL)
 
 # The standardized RATSL weight plot by group, time and ID
 ggplot(RATSL, aes(x = Time, y = std_weight, linetype = ID)) +
@@ -101,9 +102,10 @@ ggplot(RATSL, aes(x = Time, y = std_weight, group = ID)) +
 
 ###  Analysis 
 
-Creating, and plotting the summary data.
+Creating, and plotting the summary data. The RATS data does not seem to contain outliers, so there is no need to exclude them.
 
 ```{r}
+
 
 # Number of measurement days, baseline (day 1) included
 n <- RATSL$Time %>% unique() %>% length()
@@ -113,17 +115,17 @@ n # =11
 #n <- BPRSL$week %>% unique() %>% length()
 
 # Summary data with mean and standard error of weight grouped by Group and Time 
-RATSL <- RATSL %>%
+RATSS <- RATSL %>%
   group_by(Group, Time) %>%
   summarise(mean = mean(Weight), se = sd(Weight)/sqrt(n) ) %>%
   ungroup()
 
 # Glimpse the data
-glimpse(RATSL)
-View(RATSL)
+glimpse(RATSS)
+View(RATSS)
 
 # Plot the mean profiles
-ggplot(RATSL, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
+ggplot(RATSS, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
   geom_line() +
   scale_linetype_manual(values = c(1,2,3)) +
   geom_point(size=3) +
@@ -133,7 +135,7 @@ ggplot(RATSL, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
   scale_y_continuous(name = "mean(Weight) +/- se(Weight)")
 
 # A boxplot of the mean versus group
-ggplot(RATSL, aes(x = Group, y = mean)) +
+ggplot(RATSS, aes(x = Group, y = mean)) +
   geom_boxplot() +
   stat_summary(fun = "mean", geom = "point", shape=23, size=4, fill = "white") +
   scale_y_continuous(name = "mean(weight), days")
@@ -142,9 +144,40 @@ ggplot(RATSL, aes(x = Group, y = mean)) +
 ```
 ### The analysis
 
-T-test and ANOVA
+The results of the ANOVA indicate, that the differences between the groups were statistically significant. 
 
 ```{r}
+
+# Creating a summary data by Group and ID with mean as the summary variable (ignoring baseline time 1).
+RATSL8S <- RATSL %>%
+  filter(Time > "1") %>%
+  group_by(Group) %>%
+  summarise( Time = Time, 
+             mean=mean(Weight) ) %>%
+  ungroup()
+
+# Glimpse the data
+glimpse(RATSL8S)
+View(RATSL8S)
+
+# Add the baseline from the original data as a new variable to the summary data
+View(RATS)
+
+RATS2 <- RATS %>%
+  gather(key = WD, value = Weight, -ID, -Group) 
+View(RATS2)
+
+RATSL8S <- RATSL8S %>%
+  mutate(baseline = RATS2$WD1)
+
+glimpse(RATSL8S)
+View(RATSL8S)
+
+# Fit the linear model with the mean as the response 
+fit <- lm(mean ~ Group + Time, data = RATSL8S)
+
+# Compute the analysis of variance table for the fitted model with anova()
+anova(fit)
 
 ```
 
