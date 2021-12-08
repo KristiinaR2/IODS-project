@@ -8,7 +8,7 @@
 
 #####################################
 
-# I am using the dataset tetrieved, modified and analyzed by Tuomo Nieminen 2017.
+# I am using the dataset retrieved, modified and analyzed by Tuomo Nieminen 2017.
 
 # Data: “Human development” and “Gender inequality"
 # Meta files and some technical notes for these datasets can be seen here:
@@ -85,7 +85,7 @@ str(human_1)
 
 row.names(human_1) <- human_1$Country # Defining the row names of the data by the country names 
 
-human_2 <- dplyr::select(human_1, -Country) # Removing the contry name column from the data
+human_2 <- dplyr::select(human_1, -Country) # Removing the country name column from the data
 str(human_2) # human_2 contains 155 obs. of  8 variables
 
 human <- human_2 # Overwriting the old "human" data
