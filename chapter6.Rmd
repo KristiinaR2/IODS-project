@@ -11,6 +11,7 @@ date()
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
+library(lme4)
 
 ```
 
@@ -111,9 +112,6 @@ Creating, and plotting the summary data. The RATS data does not seem to contain 
 n <- RATSL$Time %>% unique() %>% length()
 n # =11
 
-# Number of weeks, baseline (week 0) included
-#n <- BPRSL$week %>% unique() %>% length()
-
 # Summary data with mean and standard error of weight grouped by Group and Time 
 RATSS <- RATSL %>%
   group_by(Group, Time) %>%
@@ -202,8 +200,12 @@ str(BPRS)
 BPRS$treatment <- factor(BPRS$treatment)
 BPRS$subject <- factor(BPRS$subject)
 
-# Convert to long form
-BPRSL <-  BPRS %>% gather(key = weeks, value = bprs, -treatment, -subject)
+# Adding individual IDs
+BPRS$ID <- seq.int(nrow(BPRS))
+glimpse(BPRS)
+
+# Converting to long form
+BPRSL <-  BPRS %>% gather(key = weeks, value = bprs, -treatment, -subject, -ID)
 glimpse(BPRSL)
 
 # Extract the week number
@@ -211,13 +213,46 @@ BPRSL <-  BPRSL %>% mutate(week = as.integer(substr(weeks,5,5)))
 
 # Take a glimpse at the BPRSL data
 glimpse(BPRSL)
+View(BPRSL)
+
+# Plot
+ggplot(BPRSL, aes(x = week, y = bprs, group = ID)) +
+  geom_line(aes(linetype = treatment)) +
+  scale_x_continuous(name = "weeks", breaks = seq(0,8)) +
+  scale_y_continuous(name = "bprs") +
+  theme(legend.position = "top")
+
+
+```
+### Standardizing the data
+
+n <- 20
+
+```{r}
+# Standardise the variable bprs
+BPRSL <- BPRSL %>%
+  group_by(week) %>%
+  mutate(stdbprs = (bprs - mean(bprs))/sd(bprs) ) %>%
+  ungroup()
+
+# Glimpse the data
+glimpse(BPRSL)
+
 
 ```
 
 
 ### Plots
 
+
 ```{r}
+# The distributions of bprs values
+ggplot(BPRSL, aes(x= bprs)) + 
+  facet_wrap("treatment", scales = "free") + 
+  geom_bar()
+
+# Plots with non-standardised values
+
 ggplot(BPRSL, aes(x = week, y = bprs, linetype = subject)) +
   geom_line() +
   scale_linetype_manual(values = rep(1:10, times=4)) +
@@ -226,15 +261,144 @@ ggplot(BPRSL, aes(x = week, y = bprs, linetype = subject)) +
   scale_y_continuous(limits = c(min(BPRSL$bprs), max(BPRSL$bprs)))
 
 
+# Plot with the standardised bprs
+
+ggplot(BPRSL, aes(x = week, y = stdbprs, linetype = subject)) +
+  geom_line() +
+  scale_linetype_manual(values = rep(1:10, times=4)) +
+  facet_grid(. ~ treatment, labeller = label_both) +
+  scale_y_continuous(name = "standardized bprs")
+
+
+```
+
+### Detecting and filtering the outlier
+
+```{r}
+BPRSL8S <- BPRSL %>%
+  filter(week > 0) %>%
+  group_by(treatment, subject, ID) %>%
+  summarise( mean=mean(bprs) ) %>%
+  ungroup()
+
+# Glimpse the data
+glimpse(BPRSL8S)
+
+# Draw a boxplot of the mean versus treatment
+ggplot(BPRSL8S, aes(x = treatment, y = mean)) +
+  geom_boxplot() +
+  stat_summary(fun.y = "mean", geom = "point", shape=23, size=4, fill = "white") +
+  scale_y_continuous(name = "mean(bprs), weeks 1-8")
+
+# Create a new data by filtering the outlier and adjust the ggplot code the draw the plot again with the new data
+BPRSL8S1 <- BPRSL8S %>%
+  filter(mean < 60)
+
+# Draw a boxplot 2 of the mean versus treatment
+ggplot(BPRSL8S1, aes(x = treatment, y = mean)) +
+  geom_boxplot() +
+  stat_summary(fun.y = "mean", geom = "point", shape=23, size=4, fill = "white") +
+  scale_y_continuous(name = "mean(bprs), weeks 1-8")
+
+# Glimpse the data
+glimpse(BPRSL8S1)
+
+
 ```
 
 
 ## 6.3 Linear Mixed Effects Models 
 
+"The main objective in the analysis of data from a longitudinal study is to
+characterize change in the repeated values of the response variable and to de-
+termine the explanatory variables most associated with any change." (MABS, p. 169)
+
+"Linear mixed effects models are suitable for responses that can be assumed to be approximately normally distributed after conditioning on the explanatory variables." (MABS, p. 170)
+
+
+### A regression model BPRSL_reg
+
+Ignoring the repeated-measures structure of the data, next a multiple linear regression model is fitted with bprs as dependent and week and treatment as explanatory variables.
+
+The results indicate, that the measurement time (week) was statistically significant explanatory variable (p<.000) for bprs scores. The treatment group was not statistically significant (p=.661).
+
+```{r}
+
+BPRSL_reg <- lm(bprs ~ week + treatment, data = BPRSL)
+
+# print out a summary of the model
+summary(BPRSL_reg)
+
+```
+
+### The Random Intercept Model
+
 
 
 ```{r}
 
+# Create a random intercept model
+BPRSL_ref <- lmer(bprs ~ week + treatment + (1 | ID), data = BPRSL, REML = FALSE)
+
+# Print the summary of the model
+summary(BPRSL_ref)
+
+
 ```
 
+### A random intercept and random slope model
+
+```{r}
+
+RATS_ref1 <- lmer(Weight ~ Time + Group + (Time | ID), data = RATSL, REML = FALSE)
+
+# print a summary of the model
+summary(RATS_ref1)
+
+# perform an ANOVA test on the two models
+anova(RATS_ref1, RATS_ref)
+
+```
+
+### Random Intercept and Random Slope Model with interaction
+
+```{r}
+
+# create a random intercept and random slope model
+RATS_ref2 <- lmer(Weight ~ Time * Group + (Time | ID), data = RATSL, REML = FALSE)
+
+# print a summary of the model
+summary(RATS_ref2)
+
+# perform an ANOVA test on the two models
+anova(RATS_ref2, RATS_ref1)
+
+# draw the plot of RATSL
+ggplot(RATSL, aes(x = Time, y = Weight, group = ID)) +
+  geom_line(aes(linetype = Group)) +
+  scale_x_continuous(name = "Time (days)", breaks = seq(0, 60, 20)) +
+  scale_y_continuous(name = "Observed weight (grams)") +
+  theme(legend.position = "top")
+
+# Create a vector of the fitted values
+Fitted <- fitted(RATS_ref2)
+
+# Create a new column fitted to RATSL
+RATSL <- RATSL %>%
+  mutate(Fitted)
+
+# draw the plot of RATSL
+ggplot(RATSL, aes(x = Time, y = Fitted, group = ID)) +
+  geom_line(aes(linetype = Group)) +
+  scale_x_continuous(name = "Time (days)", breaks = seq(0, 60, 20)) +
+  scale_y_continuous(name = "Fitted weight (grams)") +
+  theme(legend.position = "top")
+
+```
+
+### 
+
+```{r}
+
+```
 
