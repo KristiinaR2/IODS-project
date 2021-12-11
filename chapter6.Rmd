@@ -56,14 +56,14 @@ glimpse(RATSL)
 
 ```
 
-### RATS (long) plots
+### RATS plots
 
 ```{r}
 
 # The dimensions of the data
 dim(RATSL)
 
-# Plot of the the non-standardized RATSL data
+# The individual rat growth profiles (non-standardized)
 ggplot(RATSL, aes(x = Time, y = Weight, group = ID)) +
   geom_line(aes(linetype = Group)) +
   scale_x_continuous(name = "Time (days)", breaks = seq(0, 60, 10)) +
@@ -90,7 +90,7 @@ ggplot(RATSL, aes(x = Time, y = std_weight, linetype = ID)) +
   facet_grid(. ~ Group, labeller = label_both) +
   scale_y_continuous(name = "standardized weight")
 
-# The standardized RATSL weight plot by groups and time
+# The individual rat growth profiles (standardized)
 ggplot(RATSL, aes(x = Time, y = std_weight, group = ID)) +
   geom_line(aes(linetype = Group)) +
   scale_x_continuous(name = "Time (days)", breaks = seq(0, 60, 10)) +
@@ -102,7 +102,7 @@ ggplot(RATSL, aes(x = Time, y = std_weight, group = ID)) +
 
 ###  Analysis 
 
-Creating, and plotting the summary data. The RATS data does not seem to contain outliers, so there is no need to exclude them.
+Creating, and plotting the summary data. The RATS data does not seem to contain outliers, so there is no need to exclude them. There are 11 measurement points, for the 
 
 ```{r}
 
@@ -321,7 +321,7 @@ Multilevel models (also known as hierarchical linear models, linear mixed-effect
 
 Ignoring the repeated-measures structure of the data, a multiple linear regression model is fitted with bprs as dependent and week and treatment as explanatory variables. This model assumes independence of the repeated measures of bprs, and this assumption is highly unlikely.
 
-The results of the model indicate, that the measurement time (week) was statistically significant explanatory variable (p<.000) for bprs scores. The treatment group was not statistically significant (p=.661).
+The results of the model indicate, that the measurement time (week) was statistically significant explanatory variable (p<.000) for bprs scores, as the treatment group was not statistically significant (p=.661). The model explains 18% of the variation in bprs scores. 
 
 ```{r}
 
@@ -334,13 +334,15 @@ summary(BPRSL_reg)
 
 ### The Random Intercept Model
 
-To begin the multilevel analysis of the BPRS data, first the fit the random intercept model for the same two explanatory variables (week & treatment) is fitted. Fitting a random intercept model allows the linear regression fit for each subject to differ in intercept from other subjects.
+To begin the multilevel analysis of the BPRS data, first the random intercept model for the two explanatory variables (week & treatment) is fitted. Fitting a random intercept model allows the linear regression fit for each subject to differ in intercept from other subjects.
 
 The first argument of lmer() function of the lme4 package is the formula object describing both the fixed-effects and random effects part of the model, with the response on the left of a ~ operator and the terms, separated by + operators, on the right. The random-effects terms distinguished by vertical bars (|).
 
-"??? The estimated variance of the subject random effects is quite large (),
-indicating the considerable variation in the intercepts of the regression ﬁts of
-the individual bprs proﬁles."
+In this model (bprs ~ week + treatment + (1 | ID)), where the week and treatment group are the fixed effects, compared to the multiple regression model, that was conducted first:
+
+a) the standard error of the week is smaller (indicating that assuming independence will lead to the standard error of a within-subject covariate such as measurement time being larger than it should be because of ignoring the likely within-subject dependences, which will reduce the error variance in the model), and the t-value larger (incidating greater significance)
+b) the the standard error of treatment group is larger, and the t-value is smaller (indicating that the significance is non-significant also in this model and even lower than in the first model)
+
 
 ```{r}
 library(lme4)
@@ -348,7 +350,7 @@ library(Rcpp)
 
 # Create a random intercept model
 
-BPRSL_ref <- lmer(bprs ~ week + treatment + (1 | ID), data = BPRSL, REML = FALSE)
+BPRSL_ref <- lmer(bprs ~ week + treatment + (1 | ID), data = BPRSL, REML = F)
 
 # Print the summary of the model
 summary(BPRSL_ref)
@@ -358,6 +360,9 @@ summary(BPRSL_ref)
 
 ### A random intercept and random slope model
 
+Fitting the random intercept and random slope model to the BPRS data allows the linear regression fits for each individual to differ in intercept but also in slope. This way it is possible to account for the individual differences in the bprs score profiles, but also the effect of measurement times and treatment.
+
+The random intercept and slope model seems to provide a better ﬁt for these data: the AIC is slightly smaller, and in comparing the models (BPRSL_ref: bprs ~ week + treatment + (1 | ID), BPRSL_ref1: bprs ~ week + treatment + (week | ID)) with ANOVA  the chi-squared statistic of the latter is 63.663 (df 2), with a very small p-value (1.499e-14 ***).
 
 
 ```{r}
@@ -374,6 +379,11 @@ anova(BPRSL_ref, BPRSL_ref1)
 
 ### Random Intercept and Random Slope Model with interaction
 
+Finally, the ﬁt a random intercept and slope model is fitted. This model allows for a
+group × time interaction. 
+
+The fixed effect week*treatments t-value (1,349) is not significant. 
+Comparison of the models (BPRSL_ref1: bprs ~ week + treatment + (week | ID), BPRSL_ref2: bprs ~ week * treatment + (week | ID)) shows, that there is no significant difference between them (chi-squared 1.78, p=0.1821). The AIC and the BIC are slightly larger in the model with interaction, so it is concluded that the random intercept and random slope model without the interaction provides a better model for the data. 
 
 
 ```{r}
@@ -390,7 +400,7 @@ anova(BPRSL_ref2, BPRSL_ref1)
 # 
 ggplot(BPRSL, aes(x = week, y = bprs, group = ID)) +
   geom_line(aes(linetype = treatment)) +
-  scale_x_continuous(name = "Time (weeks)", breaks = seq(1, 8)) +
+  scale_x_continuous(name = "Time (weeks)", breaks = seq(0, 8)) +
   scale_y_continuous(name = "Bprs score") +
   theme(legend.position = "top")
 
@@ -404,16 +414,10 @@ BPRSL <- BPRSL %>%
 # draw the plot of RATSL
 ggplot(BPRSL, aes(x = week, y = Fitted, group = ID)) +
   geom_line(aes(linetype = treatment)) +
-  scale_x_continuous(name = "Time (weeks)", breaks = seq(1, 8)) +
+  scale_x_continuous(name = "Time (weeks)", breaks = seq(0, 8)) +
   scale_y_continuous(name = "Bprs score") +
   theme(legend.position = "top")
  
-
-```
-
-### 
-
-```{r}
 
 ```
 
