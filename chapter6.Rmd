@@ -16,15 +16,8 @@ library(ggplot2)
 
 # Chapter 6: Analysis of longitudinal data
 
-The Analysis exercise focuses on exploring your data and performing and interpreting simple straightforward methods (based on summary measures of data) and more advanced methods (called linear mixed effects models). For completing the Analysis exercises, include all the codes, your interpretations and explanations in the R Markdown file chapter6.Rmd.
-
-Note: As you read the data sets in your chapter6.Rmd you may have to factor the categorical variables again, as R may not recognise them automatically as factors.
-
 
 ## 6.1 RATS
-
-"Implement the analyses of Chapter 8 of MABS using the RATS data. (0-7 points: 0-4 points for graphs or analysis results + 0-3 points for their interpretations)"
-
 
 ### The data
 
@@ -102,7 +95,7 @@ ggplot(RATSL, aes(x = Time, y = std_weight, group = ID)) +
 
 ###  Analysis 
 
-Creating, and plotting the summary data. The RATS data does not seem to contain outliers, so there is no need to exclude them. There are 11 measurement points, for the 
+Creating, and plotting the summary data. The RATS data does not seem to contain outliers, so there is no need to exclude them. 
 
 ```{r}
 
@@ -141,9 +134,7 @@ ggplot(RATSS, aes(x = Group, y = mean)) +
 ```
 ### The analysis
 
-The results of the ANOVA indicate that the differences between the groups were statistically significant. (I couldn't figure out how to add the baseline variable to the RATSL8S?).
-
-Posthoc test?
+The results of the ANOVA indicate that the differences between the groups were statistically significant. 
 
 ```{r}
 
@@ -182,8 +173,6 @@ anova(fit)
 
 
 ## 6.2 BPRS
-
-"Implement the analyses of Chapter 9 of MABS using the BPRS data. (0-8 points: 0-4 points for graphs or analysis results + 0-4 points for their interpretations)"
 
 The data consists of 40 male subjects, that were randomly assigned to one of two treatment groups and each subject was rated on the brief psychiatric rating scale (BPRS) measured before treatment began (week 0), and then at weekly intervals for eight weeks. The BPRS assesses the level of 18 symptom constructs, with scale 1 (not present) - 7 (extremely severe). (MABS, p. 157)
 
@@ -227,7 +216,6 @@ ggplot(BPRSL, aes(x = week, y = bprs, group = ID)) +
 ```
 ### Standardizing the data
 
-n <- 20
 
 ```{r}
 # Standardise the variable bprs
@@ -281,7 +269,7 @@ BPRSL8S <- BPRSL %>%
   summarise( mean=mean(bprs) ) %>%
   ungroup()
 
-# Glimpse the data
+# Glimpse of the data
 glimpse(BPRSL8S)
 
 # Draw a boxplot of the mean versus treatment
@@ -290,17 +278,17 @@ ggplot(BPRSL8S, aes(x = treatment, y = mean)) +
   stat_summary(fun.y = "mean", geom = "point", shape=23, size=4, fill = "white") +
   scale_y_continuous(name = "mean(bprs), weeks 1-8")
 
-# Create a new data by filtering the outlier and adjust the ggplot code the draw the plot again with the new data
+# A new data by filtering the outlier 
 BPRSL8S1 <- BPRSL8S %>%
   filter(mean < 60)
 
-# Draw a boxplot 2 of the mean versus treatment
+# A boxplot 2 of the mean versus treatment
 ggplot(BPRSL8S1, aes(x = treatment, y = mean)) +
   geom_boxplot() +
   stat_summary(fun.y = "mean", geom = "point", shape=23, size=4, fill = "white") +
   scale_y_continuous(name = "mean(bprs), weeks 1-8")
 
-# Glimpse the data
+# Glimpse of the data
 glimpse(BPRSL8S1)
 
 
@@ -309,12 +297,10 @@ glimpse(BPRSL8S1)
 
 ## 6.3 Linear Mixed Effects Models 
 
-"The main objective in the analysis of data from a longitudinal study is to
-characterize change in the repeated values of the response variable and to determine the explanatory variables most associated with any change." (MABS, p. 169)
+The main objective in the analysis of data from a longitudinal study is to
+characterize change in the repeated values of the response variable and to determine the explanatory variables most associated with any change. (MABS, p. 169)
 
 Multilevel models (also known as hierarchical linear models, linear mixed-effect model, mixed models, nested data models, random coefficient, random-effects models, random parameter models, or split-plot designs) are statistical models of parameters that vary at more than one level.They can be used as an alternative to ANCOVA (analysis of covariance), and they are able to analyze  experiments without the assumptions of homogeneity-of-regression slopes (that is required by ANCOVA)." [https://en.wikipedia.org/wiki/Multilevel_model]
-
-"Linear mixed effects models are suitable for responses that can be assumed to be approximately normally distributed after conditioning on the explanatory variables." (MABS, p. 170)
 
 
 ### A regression model BPRSL_reg
