@@ -11,7 +11,6 @@ date()
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
-library(lme4)
 
 ```
 
@@ -142,7 +141,9 @@ ggplot(RATSS, aes(x = Group, y = mean)) +
 ```
 ### The analysis
 
-The results of the ANOVA indicate, that the differences between the groups were statistically significant. (I couldn't figure out how to add the baseline variable to the RATSL8S?).
+The results of the ANOVA indicate that the differences between the groups were statistically significant. (I couldn't figure out how to add the baseline variable to the RATSL8S?).
+
+Posthoc test?
 
 ```{r}
 
@@ -184,7 +185,7 @@ anova(fit)
 
 "Implement the analyses of Chapter 9 of MABS using the BPRS data. (0-8 points: 0-4 points for graphs or analysis results + 0-4 points for their interpretations)"
 
-"The data consists of 40 male subjects, that were randomly assigned to one of two treatment groups and each subject was rated on the brief psychiatric rating scale (BPRS) measured before treatment began (week 0) and then at weekly intervals for eight weeks. The BPRS assesses the level of 18 symptom constructs such as hostility, suspiciousness, hallucinations and grandiosity; each of these is rated from one (not present) to seven (extremely severe). The scale is used to evaluate patients suspected of having schizophrenia." (MABS, p. 157)
+The data consists of 40 male subjects, that were randomly assigned to one of two treatment groups and each subject was rated on the brief psychiatric rating scale (BPRS) measured before treatment began (week 0), and then at weekly intervals for eight weeks. The BPRS assesses the level of 18 symptom constructs, with scale 1 (not present) - 7 (extremely severe). (MABS, p. 157)
 
 ### The data
 
@@ -215,7 +216,7 @@ BPRSL <-  BPRSL %>% mutate(week = as.integer(substr(weeks,5,5)))
 glimpse(BPRSL)
 View(BPRSL)
 
-# Plot
+# Plot of the bprs values by ID's and measurement times (weeks)
 ggplot(BPRSL, aes(x = week, y = bprs, group = ID)) +
   geom_line(aes(linetype = treatment)) +
   scale_x_continuous(name = "weeks", breaks = seq(0,8)) +
@@ -238,7 +239,6 @@ BPRSL <- BPRSL %>%
 # Glimpse the data
 glimpse(BPRSL)
 
-
 ```
 
 
@@ -251,7 +251,7 @@ ggplot(BPRSL, aes(x= bprs)) +
   facet_wrap("treatment", scales = "free") + 
   geom_bar()
 
-# Plots with non-standardised values
+# Plots with non-standardized values
 
 ggplot(BPRSL, aes(x = week, y = bprs, linetype = subject)) +
   geom_line() +
@@ -261,7 +261,7 @@ ggplot(BPRSL, aes(x = week, y = bprs, linetype = subject)) +
   scale_y_continuous(limits = c(min(BPRSL$bprs), max(BPRSL$bprs)))
 
 
-# Plot with the standardised bprs
+# Plot with the standardized bprs
 
 ggplot(BPRSL, aes(x = week, y = stdbprs, linetype = subject)) +
   geom_line() +
@@ -310,17 +310,18 @@ glimpse(BPRSL8S1)
 ## 6.3 Linear Mixed Effects Models 
 
 "The main objective in the analysis of data from a longitudinal study is to
-characterize change in the repeated values of the response variable and to de-
-termine the explanatory variables most associated with any change." (MABS, p. 169)
+characterize change in the repeated values of the response variable and to determine the explanatory variables most associated with any change." (MABS, p. 169)
+
+Multilevel models (also known as hierarchical linear models, linear mixed-effect model, mixed models, nested data models, random coefficient, random-effects models, random parameter models, or split-plot designs) are statistical models of parameters that vary at more than one level.They can be used as an alternative to ANCOVA (analysis of covariance), and they are able to analyze  experiments without the assumptions of homogeneity-of-regression slopes (that is required by ANCOVA)." [https://en.wikipedia.org/wiki/Multilevel_model]
 
 "Linear mixed effects models are suitable for responses that can be assumed to be approximately normally distributed after conditioning on the explanatory variables." (MABS, p. 170)
 
 
 ### A regression model BPRSL_reg
 
-Ignoring the repeated-measures structure of the data, next a multiple linear regression model is fitted with bprs as dependent and week and treatment as explanatory variables.
+Ignoring the repeated-measures structure of the data, a multiple linear regression model is fitted with bprs as dependent and week and treatment as explanatory variables. This model assumes independence of the repeated measures of bprs, and this assumption is highly unlikely.
 
-The results indicate, that the measurement time (week) was statistically significant explanatory variable (p<.000) for bprs scores. The treatment group was not statistically significant (p=.661).
+The results of the model indicate, that the measurement time (week) was statistically significant explanatory variable (p<.000) for bprs scores. The treatment group was not statistically significant (p=.661).
 
 ```{r}
 
@@ -333,11 +334,20 @@ summary(BPRSL_reg)
 
 ### The Random Intercept Model
 
+To begin the multilevel analysis of the BPRS data, first the fit the random intercept model for the same two explanatory variables (week & treatment) is fitted. Fitting a random intercept model allows the linear regression fit for each subject to differ in intercept from other subjects.
 
+The first argument of lmer() function of the lme4 package is the formula object describing both the fixed-effects and random effects part of the model, with the response on the left of a ~ operator and the terms, separated by + operators, on the right. The random-effects terms distinguished by vertical bars (|).
+
+"??? The estimated variance of the subject random effects is quite large (),
+indicating the considerable variation in the intercepts of the regression ﬁts of
+the individual bprs proﬁles."
 
 ```{r}
+library(lme4)
+library(Rcpp)
 
 # Create a random intercept model
+
 BPRSL_ref <- lmer(bprs ~ week + treatment + (1 | ID), data = BPRSL, REML = FALSE)
 
 # Print the summary of the model
@@ -348,51 +358,56 @@ summary(BPRSL_ref)
 
 ### A random intercept and random slope model
 
+
+
 ```{r}
 
-RATS_ref1 <- lmer(Weight ~ Time + Group + (Time | ID), data = RATSL, REML = FALSE)
+BPRSL_ref1 <- lmer(bprs ~ week + treatment + (week | ID), data = BPRSL, REML = FALSE)
 
 # print a summary of the model
-summary(RATS_ref1)
+summary(BPRSL_ref1)
 
 # perform an ANOVA test on the two models
-anova(RATS_ref1, RATS_ref)
+anova(BPRSL_ref, BPRSL_ref1)
 
 ```
 
 ### Random Intercept and Random Slope Model with interaction
 
+
+
 ```{r}
 
 # create a random intercept and random slope model
-RATS_ref2 <- lmer(Weight ~ Time * Group + (Time | ID), data = RATSL, REML = FALSE)
+BPRSL_ref2 <- lmer(bprs ~ week * treatment + (week | ID), data = BPRSL, REML = FALSE)
 
 # print a summary of the model
-summary(RATS_ref2)
+summary(BPRSL_ref2)
 
 # perform an ANOVA test on the two models
-anova(RATS_ref2, RATS_ref1)
+anova(BPRSL_ref2, BPRSL_ref1)
 
-# draw the plot of RATSL
-ggplot(RATSL, aes(x = Time, y = Weight, group = ID)) +
-  geom_line(aes(linetype = Group)) +
-  scale_x_continuous(name = "Time (days)", breaks = seq(0, 60, 20)) +
-  scale_y_continuous(name = "Observed weight (grams)") +
+# 
+ggplot(BPRSL, aes(x = week, y = bprs, group = ID)) +
+  geom_line(aes(linetype = treatment)) +
+  scale_x_continuous(name = "Time (weeks)", breaks = seq(1, 8)) +
+  scale_y_continuous(name = "Bprs score") +
   theme(legend.position = "top")
 
 # Create a vector of the fitted values
-Fitted <- fitted(RATS_ref2)
+Fitted <- fitted(BPRSL_ref2)
 
 # Create a new column fitted to RATSL
-RATSL <- RATSL %>%
+BPRSL <- BPRSL %>%
   mutate(Fitted)
 
 # draw the plot of RATSL
-ggplot(RATSL, aes(x = Time, y = Fitted, group = ID)) +
-  geom_line(aes(linetype = Group)) +
-  scale_x_continuous(name = "Time (days)", breaks = seq(0, 60, 20)) +
-  scale_y_continuous(name = "Fitted weight (grams)") +
+ggplot(BPRSL, aes(x = week, y = Fitted, group = ID)) +
+  geom_line(aes(linetype = treatment)) +
+  scale_x_continuous(name = "Time (weeks)", breaks = seq(1, 8)) +
+  scale_y_continuous(name = "Bprs score") +
   theme(legend.position = "top")
+ 
 
 ```
 
