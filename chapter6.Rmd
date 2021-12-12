@@ -93,7 +93,7 @@ ggplot(RATSL, aes(x = Time, y = std_weight, group = ID)) +
 
 ```
 
-###  6.2 Summary Measure Analysis
+##  6.2 Summary Measure Analysis
 
 Creating and plotting the summary data. The RATS data does not seem to contain outliers, so there is no need to exclude them. 
 
