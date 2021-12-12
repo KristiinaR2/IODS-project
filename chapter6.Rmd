@@ -93,9 +93,11 @@ ggplot(RATSL, aes(x = Time, y = std_weight, group = ID)) +
 
 ```
 
-###  Analysis 
+###  6.2 Summary Measure Analysis
 
-Creating, and plotting the summary data. The RATS data does not seem to contain outliers, so there is no need to exclude them. 
+Creating and plotting the summary data. The RATS data does not seem to contain outliers, so there is no need to exclude them. 
+
+The mean response proﬁles for the two treatment groups show, that there are differences between the groups: The first group is very heterogeneous, with clearly lower weight-profile that the groups 2 and 3. The weight of the rats in group 2 increases during the weeks, but the standard deviation of the means is quite large. The third group has the biggest starting weight, that increases slightly during the weeks. 
 
 ```{r}
 
@@ -114,7 +116,7 @@ RATSS <- RATSL %>%
 glimpse(RATSS)
 View(RATSS)
 
-# Plot the mean profiles
+# Mean response proﬁles for the three groups in the RATS data
 ggplot(RATSS, aes(x = Time, y = mean, linetype = Group, shape = Group)) +
   geom_line() +
   scale_linetype_manual(values = c(1,2,3)) +
@@ -132,7 +134,7 @@ ggplot(RATSS, aes(x = Group, y = mean)) +
 
 
 ```
-### The analysis
+### ANOVA
 
 The results of the ANOVA indicate that the differences between the groups were statistically significant. 
 
@@ -148,6 +150,7 @@ RATSL8S <- RATSL %>%
 
 # Glimpse the data
 glimpse(RATSL8S)
+
 View(RATSL8S)
 
 # Add the baseline from the original data as a new variable to the summary data
@@ -161,6 +164,7 @@ RATSL8S <- RATSL8S %>%
   mutate(baseline = RATS2$WD1)
 
 glimpse(RATSL8S)
+
 View(RATSL8S)
 
 # Fit the linear model with the mean as the response 
@@ -169,10 +173,12 @@ fit <- lm(mean ~ Group + Time, data = RATSL8S)
 # Compute the analysis of variance table for the fitted model with anova()
 anova(fit)
 
+
+
 ```
 
 
-## 6.2 BPRS
+## 6.3 BPRS
 
 The data consists of 40 male subjects, that were randomly assigned to one of two treatment groups and each subject was rated on the brief psychiatric rating scale (BPRS) measured before treatment began (week 0), and then at weekly intervals for eight weeks. The BPRS assesses the level of 18 symptom constructs, with scale 1 (not present) - 7 (extremely severe). (MABS, p. 157)
 
@@ -295,7 +301,7 @@ glimpse(BPRSL8S1)
 ```
 
 
-## 6.3 Linear Mixed Effects Models 
+## 6.4 Linear Mixed Effects Models 
 
 The main objective in the analysis of data from a longitudinal study is to
 characterize change in the repeated values of the response variable and to determine the explanatory variables most associated with any change. (MABS, p. 169)
@@ -303,7 +309,7 @@ characterize change in the repeated values of the response variable and to deter
 Multilevel models (also known as hierarchical linear models, linear mixed-effect model, mixed models, nested data models, random coefficient, random-effects models, random parameter models, or split-plot designs) are statistical models of parameters that vary at more than one level.They can be used as an alternative to ANCOVA (analysis of covariance), and they are able to analyze  experiments without the assumptions of homogeneity-of-regression slopes (that is required by ANCOVA)." [https://en.wikipedia.org/wiki/Multilevel_model]
 
 
-### A regression model BPRSL_reg
+### A multiple linear regression model 
 
 Ignoring the repeated-measures structure of the data, a multiple linear regression model is fitted with bprs as dependent and week and treatment as explanatory variables. This model assumes independence of the repeated measures of bprs, and this assumption is highly unlikely.
 
